@@ -1,97 +1,64 @@
+import os
 import requests
 import pandas
-from IPython.display import display
 from bs4 import BeautifulSoup
+from IPython.display import display
+from rss_feeds import sources
 
-
-#category = input("Choose a category: ")
-#if category == "uk":
- #   bbc_category = "uk/"
- #   guardian_category = ""     
-
-# News Sources
-#bbc = "https://feeds.bbci.co.uk/news/{}rss.xml".format(bbc_category)
-url = "https://feeds.bbci.co.uk/news/rss.xml"
-#
-
-class Source:
-    __slots__ = ['name', 'rss_url']
-    def __init__(self, name, rss_url):
-        self.name = name
-        self.rss_url = rss_url
-
-bbc = Source("BBC News", "https://feeds.bbci.co.uk/news/rss.xml")
-guardian = Source("guardian", "https://www.theguardian.com/uk/rss")
-sky_news = Source("sky", "https://feeds.skynews.com/feeds/rss/uk.xml")
-daily_mail = Source("daily_mail", "https://www.dailymail.co.uk/news/index.rss")
-
-sources = []
-sources.extend((bbc, guardian, sky_news, daily_mail))
-
-def scrape_sources():
-    processed_sources = []
-    for source in sources:
-        rss_response = requests.get(source.rss_url)
-        soup = BeautifulSoup(rss_response.content, features="xml")
-
-        items = soup.findAll("item")
-        news_items = []
-        for item in items:
-            news_item = {}
-            news_item['title'] = item.title.text
-            news_item['description'] = item.description.text
-            news_item['link'] = item.link.text
-            news_item['pubDate'] = item.pubDate.text
-            news_items.append(news_item)
-
-        data_frame = pandas.DataFrame(news_items,columns=['title','description','link','pubDate'])
-        processed_sources.append(data_frame)
-    return processed_sources
-
-user_input = input("Scrape all sources or just one to csvs? ")
-number_input = input("any number or thing: ")
-if user_input == "all":
-    for source in sources:
-        rss_response = requests.get(source.rss_url)
-        soup = BeautifulSoup(rss_response.content, features="xml")
-
-        items = soup.findAll("item")
-        news_items = []
-        for item in items:
-            news_item = {}
-            news_item['title'] = item.title.text
-            news_item['description'] = item.description.text
-            news_item['link'] = item.link.text
-            news_item['pubDate'] = item.pubDate.text
-            news_item['source'] = source.name
-            news_items.append(news_item)
-
-        data_frame = pandas.DataFrame(news_items,columns=['title','description','link','pubDate','source'])
-        data_frame.to_csv('test_data_bbc.csv',index=False)
-
-elif user_input == "1":
-    source_input = input("bbc_news | guardian | sky_news | daily_mail ")
-    if source_input == "bbc_news":
-        outlet = bbc
-    elif source_input == "guardian":
-        outlet = guardian
-    elif source_input == "sky_news":
-        outlet = sky_news
-    elif source_input == "daily_mail":
-        outlet = daily_mail
-
-    rss_response = requests.get(outlet.rss_url)
+# Returns scraped data from a given RSS Feed XML file as a pandas dataframe.
+def scrapeData(url, source_name, category):
+    rss_response = requests.get(url)
     soup = BeautifulSoup(rss_response.content, features="xml")
+
     items = soup.findAll("item")
     news_items = []
     for item in items:
         news_item = {}
+        news_item['source'] = source_name
         news_item['title'] = item.title.text
         news_item['description'] = item.description.text
+        if source_name == "The Guardian":
+            description_soup = BeautifulSoup(news_item['description'], 'html.parser')
+            a_tag = description_soup.a
+            a_tag.decompose()
+            news_item['description'] = description_soup.get_text()
         news_item['link'] = item.link.text
         news_item['pubDate'] = item.pubDate.text
-        news_item['source'] = outlet.name
+        news_item['category'] = category
         news_items.append(news_item)
 
-    data_frame = pandas.DataFrame(news_items,columns=['title','description','link','pubDate','source'])
-    data_frame.to_csv('test_data_bbc.csv',index=False)
+    return pandas.DataFrame(news_items,columns=['source','title','description','link','pubDate','category'])
+
+# Scrape each feed and add them into an array
+def scrapeSource(source):
+    # For each available feed a source provides, scrape the data into separate dataframes and add them to a list
+    scraped_data = []
+    for feed in source.rss:
+        scraped_data.append(scrapeData(feed.url, source.name, feed.category))
+
+    # Concatenate each dataframe into one and discard any duplicates
+    new_data = pandas.concat(scraped_data).drop_duplicates().reset_index(drop=True)
+
+    # Find any remaining duplicates with differing categories and put them into a single row
+    new_data = new_data.groupby(['source','title','description','link','pubDate'])['category'].apply(', '.join).reset_index()
+
+    # Convert pubDate column to datetime fomat and sort the final dataframe by time (most recent first)
+    new_data['pubDate'] = pandas.to_datetime(new_data.pubDate)
+    new_data = new_data.sort_values(by='pubDate', ascending=False)
+    return new_data
+
+def updateData(file_path, new_data):
+    # Read the file and convert the pubDate column into datetime format
+    existing_data = pandas.read_csv(file_path)
+    existing_data['pubDate'] = pandas.to_datetime(existing_data.pubDate)
+
+    # Concatenate new data and existing data whilst removing duplicates and sorting by time (most recent first)
+    updated_data = pandas.concat([existing_data, new_data]).drop_duplicates().reset_index(drop=True).sort_values(by='pubDate', ascending=False)
+    updated_data.to_csv(file_path,index=False)
+
+def scrapeAllSources():
+    for source in sources:
+        display(scrapeSource(source))
+        
+
+#display(scrapeSource(sources[2]))

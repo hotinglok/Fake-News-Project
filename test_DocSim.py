@@ -1,8 +1,11 @@
+# This code was originally made by Vishwa (@v1shwa) and can be found at https://github.com/v1shwa/document-similarity.
+# This code is used under the MIT License stated in the repository above.
+# Minor edits have been made for the purposes of this project.
+
 from gensim.models.keyedvectors import KeyedVectors
 import numpy as np
 from DocSim import DocSim
 import unittest
-
 
 class DocSimTest(unittest.TestCase):
     @classmethod
@@ -18,7 +21,6 @@ class DocSimTest(unittest.TestCase):
         expected = np.array([0.5, 0.5, 0.6, 0.3, 0.2, 0.1, 0.4, 0.6, 0.5, 0.5])
         actual = self.doc_sim.vectorize(source_doc)
         self.assertEqual(expected.all(), actual.all())
-
 
 if __name__ == "__main__":
     unittest.main()
