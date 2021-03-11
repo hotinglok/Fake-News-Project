@@ -17,7 +17,7 @@ class Feed:
         self.url = url
 
 # Where the data is stored
-data_path_prefix = "y:/New Volume/Work & School/School/University of York/Year 4/Fake News/Code/Fake-News-Project/Article Collation/Data/"
+data_path_prefix = "y:/New Volume/Work & School/School/University of York/Year 4/Fake News/Code/Fake-News-Project/Article Collation/Data/News/"
 
 # RSS Feeds
 # BBC scraped from every feed at 23:57, 08/03/2021 has 268 unique articles across all of them
@@ -72,7 +72,7 @@ sources = [bbc, guardian, sky, daily_mail]
 
 # Skip words - RSS Feeds contain live articles which have an entirely different format from regular articles in most cases.
 # The Guardian takes this a step further and includes all opinion pieces too, though they often include "| John Doe" to indicate this.
-skip_words = ["/live/", "news-live", "/video/", "/datablog/", "/gallery/", "/keep-connected/", "/picture", "/ng-interactive"]
+skip_words = ["/live/", "/video/", "/datablog/", "/gallery/", "/keep-connected/", "/picture", "/ng-interactive"]
 
 def isValidURL(url):
     for word in skip_words:
