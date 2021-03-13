@@ -1,7 +1,6 @@
 import os
 import requests
 import pandas
-import re
 from bs4 import BeautifulSoup
 from IPython.display import display
 from rss_feeds import sources, isValidURL
@@ -66,7 +65,8 @@ def test(url, source_name, category):
 
    # return pandas.DataFrame(shit,columns=['source','title','description','link','pubDate','category'])
     #display(pandas.DataFrame(news_items,columns=['source','title','description','link','pubDate','category']))
-    return pandas.DataFrame(news_items,columns=['source','title','description','link','pubDate','category'])
+    data = pandas.DataFrame(news_items,columns=['source','title','description','link','pubDate','category'])
+    return data
 
 # Scrape each feed and add them into an array
 def scrapeTest(source):
@@ -83,6 +83,23 @@ def scrapeTest(source):
     # Convert pubDate column to datetime fomat and sort the final dataframe by time (most recent first)
     new_data['pubDate'] = pandas.to_datetime(new_data.pubDate)
     new_data = new_data.sort_values(by='pubDate', ascending=False)
+    return new_data
+
+# Scrape each feed and add them into an array
+def scrapeTest2(source):
+    # For each available feed a source provides, scrape the data into separate dataframes and add them to a list
+    scraped_data = []
+    for feed in source.rss:
+        scraped_data.append(test(feed.url, source.name, feed.category))
+
+    # Concatenate each dataframe into one and discard any duplicates
+    new_data = pandas.concat(scraped_data).drop_duplicates().reset_index(drop=True)
+
+    # Find any remaining duplicates with differing categories and put them into a single row
+    new_data = new_data.groupby(['source','title','description','link','pubDate'])['category'].apply(', '.join).reset_index()
+    # Convert pubDate column to datetime fomat and sort the final dataframe by time (most recent first)
+    new_data['pubDate'] = pandas.to_datetime(new_data.pubDate)
+    #new_data = new_data.sort_values(by='pubDate', ascending=False)
     return new_data
 
 # Scrape each feed and add them into an array
@@ -111,6 +128,15 @@ def updateData(file_path, new_data):
     # Concatenate new data and existing data whilst removing duplicates and sorting by time (most recent first)
     updated_data = pandas.concat([existing_data, new_data]).drop_duplicates().reset_index(drop=True).sort_values(by='pubDate', ascending=False)
     updated_data.to_csv(file_path,index=False)
+
+def updateTest(file_path, new_data):
+    # Read the file and convert the pubDate column into datetime format
+    existing_data = pandas.read_csv(file_path)
+    existing_data['pubDate'] = pandas.to_datetime(existing_data.pubDate)
+
+    # Concatenate new data and existing data whilst removing duplicates and sorting by time (most recent first)
+    updated_data = pandas.concat([existing_data, new_data]).drop_duplicates().reset_index(drop=True).sort_values(by='pubDate', ascending=False)
+    return updated_data
 
 def scrapeAllSources():
     for source in sources:

@@ -2,6 +2,7 @@ import pandas
 from bs4 import BeautifulSoup
 from IPython.display import display
 
+# Testing concatenation of multiple .csvs/dataframes to test .drop_duplicates()
 """ df1 = pandas.read_csv("BBC Newsdata1.csv")
 df2 = pandas.read_csv("BBCdata1.csv")
 

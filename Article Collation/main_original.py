@@ -45,6 +45,8 @@ for source in sources:
         print("{} has {} article(s) containing the keyword(s)".format(source.name, len(matches_df.index)))
         queried_dfs.append(matches_df)
 
+# TODO 2nd Query for articles within date range
+
 # Pre-processing the queried sources so that the entire row is preserved
 processed_sources = []
 bbc_processed = Source("BBC News", queried_dfs[0])
