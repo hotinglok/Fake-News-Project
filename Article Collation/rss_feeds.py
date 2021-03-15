@@ -64,10 +64,10 @@ Feed("Top Science Stories", "https://www.dailymail.co.uk/sciencetech/index.rss")
 Feed("Top Showbiz Stories", "https://www.dailymail.co.uk/tvshowbiz/index.rss")]
 
 # Sources
-bbc = Source("BBC News", os.path.join(data_path_prefix,r'bbc_data.csv'), bbc_rss)
-guardian = Source("The Guardian", os.path.join(data_path_prefix,r'guardian_data.csv'), guardian_rss)
-sky = Source("Sky News", os.path.join(data_path_prefix,r'sky_data.csv'), sky_rss)
-daily_mail = Source("Daily Mail", os.path.join(data_path_prefix,r'daily_mail_data.csv'), daily_mail_rss)
+bbc = Source("BBC News", os.path.join(data_path_prefix,r'bbc_data.db'), bbc_rss)
+guardian = Source("The Guardian", os.path.join(data_path_prefix,r'guardian_data.db'), guardian_rss)
+sky = Source("Sky News", os.path.join(data_path_prefix,r'sky_data.db'), sky_rss)
+daily_mail = Source("Daily Mail", os.path.join(data_path_prefix,r'daily_mail_data.db'), daily_mail_rss)
 sources = [bbc, guardian, sky, daily_mail]
 
 # Skip words - RSS Feeds contain live articles which have an entirely different format from regular articles in most cases.
