@@ -2,6 +2,7 @@ import os
 import requests
 import pandas
 import sqlite3 as sql
+import datetime
 from bs4 import BeautifulSoup
 from IPython.display import display
 from rss_feeds import sources, isValidURL
@@ -60,7 +61,7 @@ def scrapeSource(source):
     new_data = new_data.groupby(['source','title','description','link','pubDate'])['category'].apply(', '.join).reset_index()
     # Convert pubDate column to datetime fomat and sort the final dataframe by time (most recent first)
     new_data['pubDate'] = pandas.to_datetime(new_data.pubDate)
-    new_data = new_data.sort_values(by='pubDate', ascending=False).reset_index(drop=True)
+    new_data = new_data.sort_values(by='pubDate', ascending=True).reset_index(drop=True)
     return new_data
 
 """ def updateData(file_path, new_data):
@@ -72,6 +73,7 @@ def scrapeSource(source):
     updated_data = pandas.concat([existing_data, new_data]).drop_duplicates().reset_index(drop=True).sort_values(by='pubDate', ascending=False)
     updated_data.to_csv(file_path,index=False) """
 
+""" # Returns updated dataframe instead of just saving it to csv
 def updateTest(file_path, new_data):
     # Read the file and convert the pubDate column into datetime format
     existing_data = pandas.read_csv(file_path)
@@ -79,13 +81,23 @@ def updateTest(file_path, new_data):
 
     # Concatenate new data and existing data whilst removing duplicates and sorting by time (most recent first)
     updated_data = pandas.concat([existing_data, new_data]).drop_duplicates().reset_index(drop=True).sort_values(by='pubDate', ascending=False)
-    return updated_data
+    return updated_data """
 
-def readData(file_path, date):
-    end_time = date
-    start_time = end_time - 1
-    con = sql.connect(file_path)
-    existing_data = pandas.read_sql_query('SELECT * FROM data WHERE pubDate BETWEEN "{}" AND "{}"'.format(start_time, end_time), con)
+def readData(file_path, date="none"):
+    # SQLite BETWEEN accepts datetime or string inputs.
+    # The following start/end times are for date inputted and 1 day before
+        # start_time = datetime.datetime.strptime(date, '%Y-%m-%d') - datetime.timedelta(days=1)
+        # end_time = start_time + datetime.timedelta(days=2)
+
+    con = sql.connect(file_path)    
+    if date == "none":
+        existing_data = pandas.read_sql_query('SELECT * FROM data ORDER BY pubDate DESC', con)
+    else:
+        # The following start/end times are for just the date inputted.
+        start_time = datetime.datetime.strptime(date, '%Y-%m-%d')
+        end_time = start_time + datetime.timedelta(days=1)
+        existing_data = pandas.read_sql_query('SELECT * FROM data WHERE pubDate BETWEEN "{}" AND "{}" ORDER BY pubDate DESC'.format(start_time, end_time), con)
+
     con.close()
     return existing_data
 
@@ -114,6 +126,17 @@ def updateData2(file_path, new_data):
     con.close()
     return updated_data
 
+def updateDataAppend(file_path, new_data):
+    # Read the file and convert the pubDate column into datetime format
+    con = sql.connect(file_path)
+    existing_data = pandas.read_sql_query('SELECT * FROM data', con)
+    existing_data['pubDate'] = pandas.to_datetime(existing_data['pubDate'])
+    unique_data = getUniqueData2(existing_data, new_data)
+
+    unique_data.to_sql('data', con, index=False, if_exists='append')
+    con.close()
+    return unique_data 
+
 def getUniqueData2(existing_data, new_data):
     # Read the file and convert the pubDate column into datetime format
     cond = new_data['link'].isin(existing_data['link'])
@@ -133,28 +156,33 @@ def getUniqueData(file_path, new_data):
     unique_data = unique_data.reset_index(drop=True)
     return unique_data
 
-def updateDB(file_path, new_data):
-    # Read the file and convert the pubDate column into datetime format
-    con = sql.connect(file_path)
-    cur = con.cursor()
-    new_data.to_sql('data', con, index=False, if_exists='append')
-    cur.execute('SELECT * FROM data ORDER BY pubDate DESC')
-    con.commit()
-    con.close()
-
-def sortDB(file_path):
-    print(file_path)
-    con = sql.connect(file_path)
-    cur = con.cursor()
-    #cur.execute('SELECT * FROM data ORDER BY pubDate DESC')
-    cur.execute('ALTER TABLE data ORDER BY pubDate DESC')
-    con.commit()
-    con.close()
-
 def createData(source, name):
     con = sql.connect('{}.db'.format(name))
     df = scrapeSource(source)
     df.to_sql('data', con, index=False)
     con.close()
+
+def searchData(data, search):
+    keywords = search.lower().split()
+    print(len(keywords))
+    keywords_string = "|".join(keywords)
+
+    # For each selected column, make all entries lowercase and return true where rows contain keywords
+    query = data['title'].str.lower().str.contains(keywords_string)| \
+            data['description'].str.lower().str.contains(keywords_string)| \
+            data['link'].str.lower().str.contains(keywords_string)
+
+    # Returns the row index of any matched rows
+    matches = query[query].index
+
+    # Add queried data to an array if matches are returned
+    matches_df = data.iloc[matches]
+    if matches_df.empty == True:
+        print("{} has no articles with the keyword(s) in this date range".format(data['source'].iloc[0]))
+    else:
+        print("{} has {} article(s) containing the keyword(s)".format(data['source'].iloc[0], len(matches_df.index)))
+        return matches_df
+
+
         
 
