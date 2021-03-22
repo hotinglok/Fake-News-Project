@@ -86,7 +86,9 @@ class DocSim:
         if len(results) == 0:
             print('There were no matching articles above the threshold')
         else:
+            test = other_source.iloc[0]
+            print('{}:'.format(test['source']))
             for result in results:
-                print("Score:{} Title:{}    Link:{}".format(result.get('score'), result.get('title'), result.get('link')))
-                
+                print("Score:{}\nTitle:{}\nLink:{}\n".format(result.get('score'), result.get('title'), result.get('link')))
+            print('-----END-----')    
         return results

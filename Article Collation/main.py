@@ -59,4 +59,5 @@ with open(stopwords_path, 'r') as fh:
     stopwords = fh.read().split(",")
 ds = DocSim(model,stopwords=stopwords)
 
-result = ds.calculateSimilarity(root_article_row['title'], queried_sources[1])
+for source in queried_sources:
+    result = ds.calculateSimilarity(root_article_row['title'], source)
