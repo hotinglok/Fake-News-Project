@@ -1,6 +1,6 @@
 import timeit
 
-# Testing how quickly data can be returned.
+# Testing read & query speed of SQLite databases
 setup_code = '''
 from IPython.display import display
 from scrape import readData, searchData
