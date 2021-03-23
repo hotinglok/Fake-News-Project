@@ -73,7 +73,7 @@ print("Found articles: ")
 queried_root_source = processed_sources[root_source_input]
 print(queried_root_source.data)
 
-""" """ # Select an article to compare other articles to
+# Select an article to compare other articles to
 root_article_input = int(input("Select the index of the article to be used as the root article: "))
 root_article_row = queried_root_source.data.iloc[root_article_input]
 root_article_title = root_article_row['title']

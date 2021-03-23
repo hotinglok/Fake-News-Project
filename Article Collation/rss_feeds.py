@@ -1,7 +1,7 @@
 import os
 import pandas
 
-'''Class to store source data'''
+# Class to store source data
 class Source:
     __slots__ = ['name', 'path', 'rss']
     def __init__(self, name, path, rss):
@@ -9,7 +9,7 @@ class Source:
         self.path = path
         self.rss = rss
 
-'''Class to identify feeds by category'''
+# Class to identify feeds by category
 class Feed:
     __slots__ = ['category', 'url']
     def __init__(self, category, url):
@@ -74,6 +74,7 @@ sources = [bbc, guardian, sky, daily_mail]
 # The Guardian takes this a step further and includes all opinion pieces too, though they often include "| John Doe" to indicate this.
 skip_words = ["/live/", "/video/", "/datablog/", "/gallery/", "/keep-connected/", "/picture", "/ng-interactive"]
 
+# Checks if link contains skip words. Indicates an invalid article if so
 def isValidURL(url):
     for word in skip_words:
         if word in url:

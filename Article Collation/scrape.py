@@ -47,42 +47,24 @@ def scrapeFeed(url, source_name, category):
     data = pandas.DataFrame(news_items,columns=['source','title','description','link','pubDate','category'])
     return data
 
-# Scrape each feed and add them into an array
+# Scrape each feed (category) from a given source and concatenate the data into one single dataframe.
 def scrapeSource(source):
-    # For each available feed a source provides, scrape the data into separate dataframes and add them to a list
+    # For each available feed a source provides, scrape the data into separate dataframes and add them to a list.
     scraped_data = []
     for feed in source.rss:
         scraped_data.append(scrapeFeed(feed.url, source.name, feed.category))
 
-    # Concatenate each dataframe into one and discard any duplicates
+    # Concatenate each dataframe into one and discard any duplicates.
     new_data = pandas.concat(scraped_data).drop_duplicates().reset_index(drop=True)
 
-    # Find any remaining duplicates with differing categories and put them into a single row
+    # Find any remaining duplicates with differing categories and put them into a single row.
     new_data = new_data.groupby(['source','title','description','link','pubDate'])['category'].apply(', '.join).reset_index()
-    # Convert pubDate column to datetime fomat and sort the final dataframe by time (most recent first)
+    # Convert pubDate column to datetime fomat and sort the final dataframe by time (most recent first).
     new_data['pubDate'] = pandas.to_datetime(new_data.pubDate)
     new_data = new_data.sort_values(by='pubDate', ascending=True).reset_index(drop=True)
     return new_data
 
-""" def updateData(file_path, new_data):
-    # Read the file and convert the pubDate column into datetime format
-    existing_data = pandas.read_csv(file_path)
-    existing_data['pubDate'] = pandas.to_datetime(existing_data.pubDate)
-
-    # Concatenate new data and existing data whilst removing duplicates and sorting by time (most recent first)
-    updated_data = pandas.concat([existing_data, new_data]).drop_duplicates().reset_index(drop=True).sort_values(by='pubDate', ascending=False)
-    updated_data.to_csv(file_path,index=False) """
-
-""" # Returns updated dataframe instead of just saving it to csv
-def updateTest(file_path, new_data):
-    # Read the file and convert the pubDate column into datetime format
-    existing_data = pandas.read_csv(file_path)
-    existing_data['pubDate'] = pandas.to_datetime(existing_data.pubDate)
-
-    # Concatenate new data and existing data whilst removing duplicates and sorting by time (most recent first)
-    updated_data = pandas.concat([existing_data, new_data]).drop_duplicates().reset_index(drop=True).sort_values(by='pubDate', ascending=False)
-    return updated_data """
-
+# Connect to a SQLite database and return a dataframe
 def readData(file_path, date="none"):
     # SQLite BETWEEN accepts datetime or string inputs.
     # The following start/end times are for date inputted and 1 day before
@@ -90,6 +72,7 @@ def readData(file_path, date="none"):
         # end_time = start_time + datetime.timedelta(days=2)
 
     con = sql.connect(file_path)    
+    # Added "none" in case all data needed to be read
     if date == "none":
         existing_data = pandas.read_sql_query('SELECT * FROM data ORDER BY pubDate DESC', con)
     else:
@@ -101,73 +84,49 @@ def readData(file_path, date="none"):
     con.close()
     return existing_data
 
+# Appends new data to an existing SQLite database
 def updateData(file_path, new_data):
     # Read the file and convert the pubDate column into datetime format
     con = sql.connect(file_path)
     existing_data = pandas.read_sql_query('SELECT * FROM data', con)
     existing_data['pubDate'] = pandas.to_datetime(existing_data['pubDate'])
-
-    # Concatenate new data and existing data whilst removing duplicates and sorting by time (most recent first)
-    updated_data = pandas.concat([existing_data, new_data]).drop_duplicates().reset_index(drop=True).sort_values(by='pubDate', ascending=False)
-    updated_data.to_sql('data', con, index=False, if_exists='replace')
-    con.close()
-    return updated_data
-
-def updateData2(file_path, new_data):
-    # Read the file and convert the pubDate column into datetime format
-    con = sql.connect(file_path)
-    existing_data = pandas.read_sql_query('SELECT * FROM data', con)
-    existing_data['pubDate'] = pandas.to_datetime(existing_data['pubDate'])
-    unique_data = getUniqueData2(existing_data, new_data)
-
-    # Concatenate new data and existing data whilst removing duplicates and sorting by time (most recent first)
-    updated_data = pandas.concat([existing_data, unique_data]).reset_index(drop=True).sort_values(by='pubDate', ascending=False)
-    updated_data.to_sql('data', con, index=False, if_exists='replace')
-    con.close()
-    return updated_data
-
-def updateDataAppend(file_path, new_data):
-    # Read the file and convert the pubDate column into datetime format
-    con = sql.connect(file_path)
-    existing_data = pandas.read_sql_query('SELECT * FROM data', con)
-    existing_data['pubDate'] = pandas.to_datetime(existing_data['pubDate'])
-    unique_data = getUniqueData2(existing_data, new_data)
+    unique_data = getUniqueData(existing_data, new_data)
 
     unique_data.to_sql('data', con, index=False, if_exists='append')
     con.close()
-    return unique_data 
 
-def getUniqueData2(existing_data, new_data):
-    # Read the file and convert the pubDate column into datetime format
+# Appends new data to an existing table in a SQLite database
+def updateBigDB(file_path, sources):
+    con = sql.connect(file_path)
+    for source in sources:
+        # Table name is always source name
+        existing_data = pandas.read_sql_query('SELECT * FROM "{}"'.format(source.name), con)
+        new_data = scrapeSource(source)
+        unique_data = getUniqueData(existing_data, new_data)
+        unique_data.to_sql('{}'.format(source.name), con, index=False, if_exists='append')
+    con.close()
+
+# Filters out duplicates between existing and new data
+def getUniqueData(existing_data, new_data):
+    # Checks link because headlines may be re-used, links will always be unique
     cond = new_data['link'].isin(existing_data['link'])
     unique_data = new_data.drop(new_data[cond].index)
     unique_data = unique_data.reset_index(drop=True)
     return unique_data    
 
-def getUniqueData(file_path, new_data):
-    # Read the file and convert the pubDate column into datetime format
-    con = sql.connect(file_path)
-    existing_data = pandas.read_sql_query('SELECT * FROM data', con)
-    con.close()
-    existing_data['pubDate'] = pandas.to_datetime(existing_data['pubDate'])
-
-    cond = new_data['link'].isin(existing_data['link'])
-    unique_data = new_data.drop(new_data[cond].index)
-    unique_data = unique_data.reset_index(drop=True)
-    return unique_data
-
+# Creates a new database with a given name with data scraped from respective source
 def createData(source, name):
     con = sql.connect('{}.db'.format(name))
     df = scrapeSource(source)
     df.to_sql('data', con, index=False)
     con.close()
 
+# Queries the dataframe to find rows with ANY of the keywords. This is to increase likelihood of finding a related article in this first filter.
 def searchData(data, search):
     keywords = search.lower().split()
-    print(len(keywords))
     keywords_string = "|".join(keywords)
 
-    # For each selected column, make all entries lowercase and return true where rows contain keywords
+    # For each selected column, make all entries lowercase and return true where rows contain keywords.
     query = data['title'].str.lower().str.contains(keywords_string)| \
             data['description'].str.lower().str.contains(keywords_string)| \
             data['link'].str.lower().str.contains(keywords_string)
