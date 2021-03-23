@@ -9,9 +9,7 @@ import pandas'''
 
 """ run_code = '''
 df = scrapeTest(sources[0])
-display(df) '''
-
-print(timeit.timeit(setup = setup_code, stmt = run_code, number = 1)) """
+display(df) ''' """
 
 run_code = '''
 df = scrapeTest2(sources[0])
