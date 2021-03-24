@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from IPython.display import display
 from rss_feeds import sources, isValidURL
 
-# Removes <a> content </a> from any given text. Thanks The Guardian.
+# Removes <a> something </a> from any given text. Thanks The Guardian.
 def cleanDescription(text):
     soup = BeautifulSoup(text , 'html.parser')
     a_tag = soup.a
@@ -65,21 +65,21 @@ def scrapeSource(source):
     return new_data
 
 # Connect to a SQLite database and return a dataframe
-def readData(file_path, date="none"):
+def readData(source, date="none"):
     # SQLite BETWEEN accepts datetime or string inputs.
     # The following start/end times are for date inputted and 1 day before
         # start_time = datetime.datetime.strptime(date, '%Y-%m-%d') - datetime.timedelta(days=1)
         # end_time = start_time + datetime.timedelta(days=2)
 
-    con = sql.connect(file_path)    
+    con = sql.connect(source.path)    
     # Added "none" in case all data needed to be read
     if date == "none":
-        existing_data = pandas.read_sql_query('SELECT * FROM data ORDER BY pubDate DESC', con)
+        existing_data = pandas.read_sql_query('SELECT * FROM "{}" ORDER BY pubDate DESC'.format(source.name), con)
     else:
         # The following start/end times are for just the date inputted.
         start_time = datetime.datetime.strptime(date, '%Y-%m-%d')
         end_time = start_time + datetime.timedelta(days=1)
-        existing_data = pandas.read_sql_query('SELECT * FROM data WHERE pubDate BETWEEN "{}" AND "{}" ORDER BY pubDate DESC'.format(start_time, end_time), con)
+        existing_data = pandas.read_sql_query('SELECT * FROM "{}" WHERE pubDate BETWEEN "{}" AND "{}" ORDER BY pubDate DESC'.format(source.name, start_time, end_time), con)
 
     con.close()
     return existing_data
@@ -125,11 +125,19 @@ def createData(source, name):
 def searchData(data, search):
     keywords = search.lower().split()
     keywords_string = "|".join(keywords)
+    source_name = data['source'].iloc[0]
 
     # For each selected column, make all entries lowercase and return true where rows contain keywords.
-    query = data['title'].str.lower().str.contains(keywords_string)| \
-            data['description'].str.lower().str.contains(keywords_string)| \
-            data['link'].str.lower().str.contains(keywords_string)
+    ''' Both The Guardian and Sky News have keywords which aren't found in the headline/description. This is especially bad with
+        Sky News, who have included keywords (eg. "Covid 19" in "Covid 19: Some headline") on the webpage, but do not include it in the RSS Feed data.
+    '''
+    if source_name == "The Guardian" or "Sky News":
+        query = data['title'].str.lower().str.contains(keywords_string)| \
+                data['description'].str.lower().str.contains(keywords_string)| \
+                data['link'].str.lower().str.contains(keywords_string)
+    else:
+        query = data['title'].str.lower().str.contains(keywords_string)| \
+                data['description'].str.lower().str.contains(keywords_string)
 
     # Returns the row index of any matched rows
     matches = query[query].index
@@ -137,9 +145,9 @@ def searchData(data, search):
     # Add queried data to an array if matches are returned
     matches_df = data.iloc[matches]
     if matches_df.empty == True:
-        print("{} has no articles with the keyword(s) in this date range".format(data['source'].iloc[0]))
+        print("{} has no articles with the keyword(s) in this date range".format(source_name))
     else:
-        print("{} has {} article(s) containing the keyword(s)".format(data['source'].iloc[0], len(matches_df.index)))
+        print("{} has {} article(s) containing the keyword(s)".format(source_name, len(matches_df.index)))
         return matches_df
 
 
