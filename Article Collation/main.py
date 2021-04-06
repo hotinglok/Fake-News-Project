@@ -1,24 +1,17 @@
 from gensim.models.keyedvectors import KeyedVectors
 from DocSim import DocSim
 from IPython.display import display
-from scrape import readData, searchData
+from db_utils import getData
 from rss_feeds import sources
 import datetime
 import pandas
-import sqlite3 as sql
 
 # User input keywords and a date
 keywords = input("Search for a topic: ") 
 date = input("Select a date (YYYY-MM-DD): ")
 
 # Get articles from each source containing keywords at the given date
-queried_sources = []
-for source in sources:
-    data = readData(source.path, date)
-    queried_data = searchData(data, keywords)
-    queried_sources.append(queried_data)
-for source in queried_sources:   
-    display(source)
+queried_sources = getData(keywords, date)
 
 # User input to select a source to choose an article from
 root_source_input = int(input("Select a source:\n 0) BBC\n 1) The Guardian\n 2) Sky News\n 3) Daily Mail\n"))
