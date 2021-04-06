@@ -17,7 +17,8 @@ def readData(source, con, date="none"):
         existing_data = pandas.read_sql_query('SELECT * FROM {} ORDER BY pubDate DESC'.format(source.table_name), con)
     else:
         # The following start/end times are for just the date inputted.
-        start_time = datetime.datetime.strptime(date, '%Y-%m-%d')
+        original_time = datetime.datetime.strptime(date, '%Y-%m-%d')
+        start_time = original_time - datetime.timedelta(days=1)
         end_time = start_time + datetime.timedelta(days=1)
         existing_data = pandas.read_sql_query('SELECT * FROM {} WHERE pubDate BETWEEN "{}" AND "{}" ORDER BY pubDate DESC'.format(source.table_name, start_time, end_time), con)
 
@@ -48,17 +49,27 @@ def searchData(data, search):
     matches_df = data.iloc[matches]
     if matches_df.empty == True:
         print("{} has no articles with the keyword(s) in this date range".format(source_name))
+        return matches_df
     else:
         print("{} has {} article(s) containing the keyword(s)".format(source_name, len(matches_df.index)))
+        print(matches_df)
         return matches_df
 
+# Same loop that was previously in main. Converted into a function so I don't need to make multiple connections.
 def getData(keywords, date="none"):
     queried_sources = []
+    
+    # Connect to the database
     connection_string = "mysql+mysqldb://{}:{}@{}/{}".format(db_user,db_pass,db_host,db_name)
-    con = sqlalchemy.create_engine(connection_string, echo=True)
+    con = sqlalchemy.create_engine(connection_string)
+
+    # For each source, search for matches. If no matches exist, do not add dataframe into queried_sources
     for source in sources:
         data = readData(source, con, date)
         queried_data = searchData(data, keywords)
-        queried_sources.append(queried_data)
+        if queried_data.empty == True:
+            continue
+        else:
+            queried_sources.append({"name": source.name, "data": queried_data}) # Tuple for convenience.
     return queried_sources
         

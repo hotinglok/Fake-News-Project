@@ -7,31 +7,26 @@ import datetime
 import pandas
 
 # User input keywords and a date
-keywords = input("Search for a topic: ") 
-date = input("Select a date (YYYY-MM-DD): ")
+""" keywords = input("Search for a topic: ") 
+date = input("Select a date (YYYY-MM-DD): ") """
+keywords = "richard"
+date = "2021-04-06"
 
 # Get articles from each source containing keywords at the given date
 queried_sources = getData(keywords, date)
 
 # User input to select a source to choose an article from
-root_source_input = int(input("Select a source:\n 0) BBC\n 1) The Guardian\n 2) Sky News\n 3) Daily Mail\n"))
-if root_source_input == "0":
-    print("BBC Selected\n")
-    display(queried_sources[0])
+count = 0
+print("Available sources to choose from: ")
+for source in queried_sources:
+    print("{}) {}".format(count, source.get('name')))
+    count = count + 1
 
-elif root_source_input == "1":
-    print("The Guardian Selected\n")
-    display(queried_sources[1])
+root_source_input = int(input("Select a source: "))
+print("{} selected".format(queried_sources[root_source_input].get('name')))
+display(queried_sources[root_source_input].get('data'))
 
-elif root_source_input == "2":
-    print("Sky News Selected\n")
-    display(queried_sources[2])
-
-elif root_source_input == "3":
-    print("Daily Mail Selected\n")
-    display(queried_sources[3])
-
-queried_root_source = queried_sources[root_source_input]
+queried_root_source = queried_sources[root_source_input].get('data')
 del queried_sources[root_source_input]  # Remove chosen source from list so that it won't compare the root article with articles from the same source.
 
 # Select a root article to compare other articles to
@@ -49,4 +44,4 @@ with open(stopwords_path, 'r') as fh:
 ds = DocSim(model,stopwords=stopwords)
 
 for source in queried_sources:
-    result = ds.calculateSimilarity(root_article_row['title'], source)
+    result = ds.calculateSimilarity(root_article_row['title'], source.get('data'))
