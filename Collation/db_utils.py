@@ -11,15 +11,19 @@ from totally_safe_credentials import db_user, db_pass, db_host, db_name
         start_time = datetime.datetime.strptime(date, '%Y-%m-%d') - datetime.timedelta(days=1)
         end_time = start_time + datetime.timedelta(days=2)
 '''
-def readData(source, con, date="none"):
+def readData(source, con, date="none", extra_days=False):
     # Added "none" in case all data needed to be read
     if date == "none":
         existing_data = pandas.read_sql_query('SELECT * FROM {} ORDER BY pubDate DESC'.format(source.table_name), con)
     else:
         # The following start/end times are for just the date inputted.
         original_time = datetime.datetime.strptime(date, '%Y-%m-%d')
-        start_time = original_time - datetime.timedelta(days=1)
-        end_time = start_time + datetime.timedelta(days=1)
+        if extra_days == True:
+            start_time = original_time - datetime.timedelta(days=1)
+            end_time = start_time + datetime.timedelta(days=2)
+        else:
+            start_time = original_time
+            end_time = start_time + datetime.timedelta(days=1)            
         existing_data = pandas.read_sql_query('SELECT * FROM {} WHERE pubDate BETWEEN "{}" AND "{}" ORDER BY pubDate DESC'.format(source.table_name, start_time, end_time), con)
 
     return existing_data
@@ -56,20 +60,24 @@ def searchData(data, search):
         return matches_df
 
 # Same loop that was previously in main. Converted into a function so I don't need to make multiple connections.
-def getData(keywords, date="none"):
+def getData(keywords, date="none", extra_days=False):
     queried_sources = []
-    
+    matches = 0
     # Connect to the database
     connection_string = "mysql+mysqldb://{}:{}@{}/{}".format(db_user,db_pass,db_host,db_name)
     con = sqlalchemy.create_engine(connection_string)
 
     # For each source, search for matches. If no matches exist, do not add dataframe into queried_sources
     for source in sources:
-        data = readData(source, con, date)
+        data = readData(source, con, date, extra_days)
         queried_data = searchData(data, keywords)
         if queried_data.empty == True:
             continue
         else:
+            matches = matches + len(queried_data)
             queried_sources.append({"name": source.name, "data": queried_data}) # Tuple for convenience.
+    
+    if matches > 15:
+        print("There are {} articles containing the keywords. The comparisson may take a while unless you can specify the headline further.")
     return queried_sources
         

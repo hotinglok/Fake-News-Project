@@ -9,13 +9,14 @@ import pandas
 # User input keywords and a date
 """ keywords = input("Search for a topic: ") 
 date = input("Select a date (YYYY-MM-DD): ") """
-keywords = "richard"
-date = "2021-04-06"
+keywords = "india outbreak"
+date = "2021-04-20"
+extra_days = True
 
 # Get articles from each source containing keywords at the given date
-queried_sources = getData(keywords, date)
+queried_sources = getData(keywords, date, extra_days)
 
-# User input to select a source to choose an article from
+# User input to select a source to choose an article from. Count is there just as a reminder for which number to input for now
 count = 0
 print("Available sources to choose from: ")
 for source in queried_sources:
@@ -36,8 +37,8 @@ print("Root article title from {}: {}".format(root_article_row['source'], root_a
 
 # Doc-sim stuff
 print("Calculating similarity with other articles...")
-googlenews_model_path = 'y:/New Volume/Work & School/School/University of York/Year 4/Fake News/Code/Fake-News-Project/Article Collation/Data/DocSim/GoogleNews-vectors-negative300.bin'
-stopwords_path = "y:/New Volume/Work & School/School/University of York/Year 4/Fake News/Code/Fake-News-Project/Article Collation/Data/DocSim/stopwords_en.txt"
+googlenews_model_path = 'y:/New Volume/Work & School/School/University of York/Year 4/Fake News/Code/Fake-News-Project/Collation/Data/DocSim/GoogleNews-vectors-negative300.bin'
+stopwords_path = "y:/New Volume/Work & School/School/University of York/Year 4/Fake News/Code/Fake-News-Project/Collation/Data/DocSim/stopwords_en.txt"
 model = KeyedVectors.load_word2vec_format(googlenews_model_path, binary=True)
 with open(stopwords_path, 'r') as fh:
     stopwords = fh.read().split(",")
