@@ -3,5 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+.vscode
 
-Article Collation/Data/
+Article/Collation/Data/
+

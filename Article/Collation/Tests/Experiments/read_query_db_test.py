@@ -1,4 +1,4 @@
-from scrape import createData, scrapeSource, getUniqueData, updateDB, sortDB
+from scrape import createData, scrapeSource, getUniqueData, updateDB, sortDB    # Most of these no longer exist, previously used for SQLite3 db operations
 from rss_feeds import sources
 from IPython.display import display
 import sqlite3 as sql

@@ -1,6 +1,6 @@
 from IPython.display import display
-from scrape import scrapeSource, updateDataAppend, readData, createData
-from rss_feeds import sources
+from scrape import scrapeSource, updateDataAppend, readData, createData # Most functions no longer exist
+from Collation.rss_feeds import sources
 import pandas
 import sqlite3 as sql
 

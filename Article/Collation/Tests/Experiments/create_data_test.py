@@ -1,5 +1,5 @@
-from rss_feeds import sources 
-from scrape import scrapeTest, updateTest
+from Collation.rss_feeds import sources 
+from scrape import scrapeTest, updateTest   # These functions no longer exist, previously used as initial tests to scrape directly from RSS Feeds and updating csvs.
 from IPython.display import display
 import pandas
 import sqlite3 as sql

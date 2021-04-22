@@ -3,8 +3,8 @@ import MySQLdb
 import pandas
 from datetime import datetime
 from IPython.display import display
-from rss_feeds import sources
-from totally_safe_credentials import db_user, db_pass, db_host, db_name
+from Article.Collation.rss_feeds import sources
+from Article.Collation.totally_safe_credentials import db_user, db_pass, db_host, db_name
 
 # Pings the database and returns the length of the table. This shows the total number of articles stored.
 ''' Connecting to Cloud SQL was pretty different to connecting to my local SQLite files. Various connectors
@@ -29,9 +29,9 @@ con = sqlalchemy.create_engine(connection_string)
 # Simple loop to display number of articles for each source
 for source in sources:
     ''' Look back on a specific day '''
-    #existing_data = pandas.read_sql_query('SELECT * FROM {} WHERE pubDate BETWEEN "2021-04-11" AND "2021-04-12 ORDER BY pubDate ASC"'.format(source.table_name), con)
+    existing_data = pandas.read_sql_query('SELECT * FROM {} WHERE pubDate BETWEEN "2000-04-10" AND "2021-04-11 ORDER BY pubDate ASC"'.format(source.table_name), con)
     ''' Get number of total number of articles '''
-    existing_data = pandas.read_sql_query('SELECT * FROM {}'.format(source.table_name), con)
+    #existing_data = pandas.read_sql_query('SELECT * FROM {}'.format(source.table_name), con)
     print("{}: {}".format(source.name, len(existing_data)))
     #display(existing_data)
 

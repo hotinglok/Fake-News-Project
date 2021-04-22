@@ -1,8 +1,8 @@
 from gensim.models.keyedvectors import KeyedVectors
-from DocSim import DocSim
+from Article.Collation.comparison import DocSim
 
-googlenews_model_path = 'y:/New Volume/Work & School/School/University of York/Year 4/Fake News/Code/Fake-News-Project/Article Collation/Data/DocSim/GoogleNews-vectors-negative300.bin'
-stopwords_path = "y:/New Volume/Work & School/School/University of York/Year 4/Fake News/Code/Fake-News-Project/Article Collation/Data/DocSim/stopwords_en.txt"
+googlenews_model_path = 'y:/New Volume/Work & School/School/University of York/Year 4/Fake News/Code/Fake-News-Project/Article/Collation/Data/DocSim/GoogleNews-vectors-negative300.bin'
+stopwords_path = "y:/New Volume/Work & School/School/University of York/Year 4/Fake News/Code/Fake-News-Project/Article/Collation/Data/DocSim/stopwords_en.txt"
 model = KeyedVectors.load_word2vec_format(googlenews_model_path, binary=True)
 with open(stopwords_path, 'r') as fh:
     stopwords = fh.read().split(",")

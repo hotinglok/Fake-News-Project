@@ -1,10 +1,12 @@
 import re
 import os
 
+""" here = os.path.dirname(os.path.abspath(__file__))
+filename = os.path.join(here, 'stopwords-en.txt') """
+
 # Open the stopwords file and store as a list of separate words
-here = os.path.dirname(os.path.abspath(__file__))
-filename = os.path.join(here, 'stopwords-en.txt')
-with open(filename) as f:
+stopwords_path = 'y:/New Volume/Work & School/School/University of York/Year 4/Fake News/Code/Fake-News-Project/Article/Analysis/Resources/stopwords-en.txt'
+with open(stopwords_path) as f:
     stopwords = [line.rstrip() for line in f]
 
 # Functions
@@ -18,7 +20,7 @@ def split_words(text):
         return None
 
 
-def keywords(text, num_keywords=10):
+def getKeywords(text, num_keywords=10):
     """Get the top 10 keywords and their frequency scores ignores blacklisted
     words in stopwords, counts the number of occurrences of each word, and
     sorts them in reverse natural order (so descending) by number of
@@ -49,3 +51,25 @@ def keywords(text, num_keywords=10):
             articleScore = keywords[k] * 1.0 / max(num_words, 1)
             keywords[k] = articleScore * 1.5 + 1
         return dict(keywords) """
+
+def getQuotes(url):
+    """Return an object containing quotations from an article and the remaining sentences
+    """
+    quotes = []
+    text = url.body
+    for line in text[:]:   # [:] Shallow copy the list since I'm manipulating the data as I'm iterating through stuff
+        if url.source != 'daily_mail':
+            if bool(re.search(r'[\“\"]', line.get('sentence'))) == True:
+                quotes.append(line)
+                text.remove(line)
+        else:
+            if bool(re.search(r'''\s'|'\s''', line.get('sentence'))) == True:
+                quotes.append(line)
+                text.remove(line)
+                continue
+            elif bool(re.search(r"^'", line.get('sentence'))) == True:
+                quotes.append(line)
+                text.remove(line)
+                continue
+    data = {'quotes': quotes, 'text': text}
+    return data

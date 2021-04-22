@@ -1,6 +1,7 @@
-from article_scrapers import bbc, guardian, sky, daily_mail
-from analysis_utils import keywords
-from DocSim import Comparison as ds
+from Article.Analysis.scrapers import bbc, guardian, sky, daily_mail
+from Article.Analysis.utils import getKeywords
+from Article.Collation.DocSim import DocSim
+from gensim.models.keyedvectors import KeyedVectors
 
 link1 = bbc("https://www.bbc.co.uk/news/world-europe-56820970")
 link2 = guardian("https://www.theguardian.com/society/2021/apr/20/possible-link-between-johnson-johnson-vaccine-and-rare-blood-clots-says-regulator")
@@ -25,5 +26,11 @@ for link in links:
     article = " ".join(link.body)
     print(keywords(article)) """
 
-sentence = link1.body[0]
+sentence = link1.body[5]
+googlenews_model_path = 'y:/New Volume/Work & School/School/University of York/Year 4/Fake News/Code/Fake-News-Project/Collation/Data/DocSim/GoogleNews-vectors-negative300.bin'
+stopwords_path = "y:/New Volume/Work & School/School/University of York/Year 4/Fake News/Code/Fake-News-Project/Collation/Data/DocSim/stopwords_en.txt"
+model = KeyedVectors.load_word2vec_format(googlenews_model_path, binary=True)
+with open(stopwords_path, 'r') as fh:
+    stopwords = fh.read().split(",")
+ds = DocSim(model,stopwords=stopwords)
 print(ds.calculate_similarity(sentence, link3.body))

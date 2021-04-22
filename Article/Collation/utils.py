@@ -2,8 +2,8 @@ import pandas
 import datetime
 import sqlalchemy
 import MySQLdb
-from rss_feeds import sources
-from totally_safe_credentials import db_user, db_pass, db_host, db_name
+from .rss_feeds import sources
+from .totally_safe_credentials import db_user, db_pass, db_host, db_name
 
 # Return rows from an SQL database. Can return rows between a specified date or all of them in a table
 ''' SQL BETWEEN accepts datetime or string inputs.
@@ -78,6 +78,6 @@ def getData(keywords, date="none", extra_days=False):
             queried_sources.append({"name": source.name, "data": queried_data}) # Tuple for convenience.
     
     if matches > 15:
-        print("There are {} articles containing the keywords. The comparisson may take a while unless you can specify the headline further.")
+        print("There are {} articles containing the keywords. The comparisson may take a while unless you can specify the headline further.".format(matches))
     return queried_sources
         

@@ -2,8 +2,8 @@ import sqlalchemy
 import MySQLdb
 import pandas
 from IPython.display import display
-from rss_feeds import sources
-from totally_safe_credentials import db_user, db_pass, db_host, db_name
+from Collation.rss_feeds import sources
+from Collation.totally_safe_credentials import db_user, db_pass, db_host, db_name
 
 # Trying to connect to Cloud SQL and display what is currently stored.
 ''' Connecting to Cloud SQL was pretty different to connecting to my local SQLite files. Various connectors

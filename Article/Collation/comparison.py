@@ -3,7 +3,7 @@
 # Minor edits have been made for the purposes of this project.
 
 import numpy as np
-from rss_feeds import sources
+from .rss_feeds import sources
 
 class DocSim:
     def __init__(self, w2v_model, stopwords=None):
@@ -39,6 +39,7 @@ class DocSim:
             return 0
         return csim
 
+    # The original
     def calculate_similarity(self, source_doc, target_docs=None, threshold=0):
         """Calculates & returns similarity scores between given source document & all
         the target documents."""
@@ -62,6 +63,8 @@ class DocSim:
         print("Finished calculating")
         return results
 
+
+    # Legacy used in main.py
     def calculateSimilarity(self, root_source, other_source, threshold=0):
         # Add in the entire dataframe, use iterrows() here instead of the for loop
         """Calculates & returns similarity scores between given source document & all
@@ -91,4 +94,58 @@ class DocSim:
             for result in results:
                 print("Score:{}\nTitle:{}\nLink:{}\n".format(result.get('score'), result.get('title'), result.get('link')))
             print('-----END-----')    
+        return results
+
+    # This returns a dict in a similar structure to getData in the API
+    def calcSim(self, root_source, other_sources, threshold=0):
+        # Add in the entire dataframe, use iterrows() here instead of the for loop
+        """Calculates & returns similarity scores between given source document & all
+        the target documents."""
+        # This will just be a string
+        source_vec = self.vectorize(root_source)
+
+        # Need an object to hold the results for each other source
+        data = {}
+
+        # Loop through each of the other sources
+        for source in other_sources:
+            results = []
+            for index, row in source.get('data').iterrows():
+                target_vec = self.vectorize(row['title'])
+                sim_score = self._cosine_sim(source_vec, target_vec)
+                if sim_score > threshold:
+                    #print("Result {} is higher than threshold".format(doc))
+                    results.append({"score": sim_score, 
+                                    "title": row['title'],
+                                    "description": row['description'],
+                                    "link": row['link'],
+                                    "pubDate": row['pubDate'],
+                                    "category": row['category'],
+                                    "source": row['source']})
+                # Sort results by score in desc order
+                results.sort(key=lambda k: k["score"], reverse=True)
+            print("Finished calculating")
+            if len(results) == 0:
+                continue
+            else:
+                source_name = source.get('name').lower().replace(' ', '_')
+                data['{}'.format(source_name)] = results
+
+        return data
+
+    def calculate_final(self, source_doc, target_docs=None, threshold=0):
+        """Calculates & returns similarity scores between given source document & all
+        the target documents."""
+        source_vec = self.vectorize(source_doc)
+        results = []
+        for doc in target_docs:
+            target_vec = self.vectorize(doc)
+            sim_score = self._cosine_sim(source_vec, target_vec)
+            if sim_score > threshold:
+                #print("Result {} is higher than threshold".format(doc))
+                results.append({"score": sim_score, "doc": doc})
+            # Sort results by score in desc order
+            results.sort(key=lambda k: k["score"], reverse=True)
+
+        print("Finished calculating")
         return results
