@@ -16,9 +16,6 @@ class Feed:
         self.category = category
         self.url = url
 
-# Where the data is stored
-data_path_prefix = "y:/New Volume/Work & School/School/University of York/Year 4/Fake News/Code/Fake-News-Project/Article Collation/Data/News/"
-
 # RSS Feeds
 # BBC scraped from every feed at 23:57, 08/03/2021 has 268 unique articles across all of them
 bbc_rss=[

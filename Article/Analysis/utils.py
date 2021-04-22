@@ -66,10 +66,8 @@ def getQuotes(url):
             if bool(re.search(r'''\s'|'\s''', line.get('sentence'))) == True:
                 quotes.append(line)
                 text.remove(line)
-                continue
             elif bool(re.search(r"^'", line.get('sentence'))) == True:
                 quotes.append(line)
                 text.remove(line)
-                continue
     data = {'quotes': quotes, 'text': text}
     return data

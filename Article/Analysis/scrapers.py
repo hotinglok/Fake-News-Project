@@ -17,7 +17,7 @@ class bbc:
     def get_body(self) -> list:
         body = self.soup.find(class_="ssrcss-5h7eao-ArticleWrapper e1nh2i2l0")
         sentences = []
-        for index, p in enumerate(body.find_all('div', attrs={'data-component':"text-block"})):
+        for index, p in enumerate(body.find_all('div', attrs={'data-component':"text-block"} )):
             sentences.append({'sentence': p.text, 'position': index})
         return sentences
     

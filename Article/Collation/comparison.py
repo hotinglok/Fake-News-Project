@@ -107,7 +107,7 @@ class DocSim:
         # Need an object to hold the results for each other source
         data = {}
 
-        # Loop through each of the other sources
+        # Loop through the array of other sources
         for source in other_sources:
             results = []
             for index, row in source.get('data').iterrows():
@@ -133,19 +133,37 @@ class DocSim:
 
         return data
 
-    def calculate_final(self, source_doc, target_docs=None, threshold=0):
-        """Calculates & returns similarity scores between given source document & all
-        the target documents."""
-        source_vec = self.vectorize(source_doc)
-        results = []
-        for doc in target_docs:
-            target_vec = self.vectorize(doc)
-            sim_score = self._cosine_sim(source_vec, target_vec)
-            if sim_score > threshold:
-                #print("Result {} is higher than threshold".format(doc))
-                results.append({"score": sim_score, "doc": doc})
-            # Sort results by score in desc order
-            results.sort(key=lambda k: k["score"], reverse=True)
+    def calculate_final(self, root_list, other_list, threshold=0):
+        quotations = []
+        sorted_quotations = []
+        
+        while root_list:
+            if len(other_list) == 0:
+                break
+            root_quote = root_list[0].get('sentence')
+            source_vec = self.vectorize(root_quote)
+            results = []
 
-        print("Finished calculating")
-        return results
+            for item in other_list:
+                target_vec = self.vectorize(item.get('sentence'))
+                sim_score = self._cosine_sim(source_vec, target_vec)
+                if sim_score > threshold:
+                    #print("Result {} is higher than threshold".format(doc))
+                    results.append({"score": sim_score, "item": item})
+                # Sort results by score in desc order
+                results.sort(key=lambda k: k["score"], reverse=True)
+
+            sorted_quotations.append({'root_quotation': root_quote, 'other_quotation': results[0]})
+            if len(other_list) > 1:
+                other_list.remove(results[0].get('item'))
+
+            for thing in other_list:
+                print(thing)
+            root_list.remove(root_list[0])
+        
+        if len(root_list) > 0:
+            quotations.append({'sorted_quotations': sorted_quotations, 'unsorted_quotations_root': root_list})
+        elif len(other_list) > 0:
+            quotations.append({'sorted_quotations': sorted_quotations, 'unsorted_quotations_other': other_list})
+            
+        return quotations

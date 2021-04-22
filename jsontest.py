@@ -14,8 +14,9 @@ date = "2021-04-06"
 
 # Get articles from each source containing keywords at the given date
 queried_sources = getData(keywords, date)
+data = {}
 
-""" for source in queried_sources:
-    #source.get('data').to_json('{}_test'.format(source.get('name'), orient='records', indent=2))
-    test = source.get('data').to_dict(orient='records')
-    print(test) """
+for source in queried_sources:
+    source_name = source.get('name').lower().replace(' ', '_')
+    source_data = source.get('data').reset_index().to_dict(orient='records')
+    data['{}'.format(source_name)] = source_data
