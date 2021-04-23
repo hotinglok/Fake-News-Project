@@ -46,7 +46,7 @@ with open(stopwords_path, 'r') as fh:
     stopwords = fh.read().split(",")
 ds = DocSim(model,stopwords=stopwords)
 
-results = ds.calcSim(root_article_row['title'], queried_sources)
+results = ds.collateArticles(root_article_row['title'], queried_sources)
 print('Objects in results:')
 for key in results:
     print(key)

@@ -1,0 +1,75 @@
+// First plan of the API
+
+{
+    headlines: [
+        root_source: 'headline',
+        other_source: 'headline',
+    ],
+    quotations: [
+        sorted_quotations: [
+            {
+                root_quotation: {
+                    {sentence: 'sentence', index: 'index'}
+                },
+                other_quotation: {
+                    {sentence: 'sentence', index: 'index', score: 'score'}
+                },
+                index: 'index'
+            },
+            {
+                root_quotation: {
+                    {sentence: 'sentence', index: 'index'}
+                },
+                other_quotation: {
+                    {sentence: 'sentence', index: 'index', score: 'score'}
+                },
+                index: 'index'
+            }
+        ]
+        unsorted_quotations: [
+            {
+                sentence: 'sentence', index: 'index'
+            }
+        ]
+    ],
+    statistics: [
+        {
+            root_quotation: {
+                {sentence: 'sentence', index: 'index'}
+            },
+            other_quotation: {
+                {sentence: 'sentence', index: 'index', score: 'score'}
+            },
+            index: 'index'
+        }
+        {
+            root_quotation: {
+                {sentence: 'sentence', index: 'index'}
+            },
+            other_quotation: {
+                {sentence: 'sentence', index: 'index', score: 'score'}
+            },
+            index: 'index'
+        }
+    ],
+    sentences: [
+        {
+            root_quotation: {
+                {sentence: 'sentence', index: 'index'}
+            },
+            other_quotation: {
+                {sentence: 'sentence', index: 'index', score: 'score'}
+            },
+            index: 'index'
+        },
+        {
+            root_quotation: {
+                {sentence: 'sentence', index: 'index'}
+            },
+            other_quotation: {
+                {sentence: 'sentence', index: 'index', score: 'score'}
+            },
+            index: 'index'
+        }
+    ],
+}

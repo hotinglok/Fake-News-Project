@@ -53,21 +53,40 @@ def getKeywords(text, num_keywords=10):
         return dict(keywords) """
 
 def getQuotes(url):
-    """Return an object containing quotations from an article and the remaining sentences
+    """Return an object containing quotation from an article and the remaining sentences
     """
     quotes = []
     text = url.body
     for line in text[:]:   # [:] Shallow copy the list since I'm manipulating the data as I'm iterating through stuff
         if url.source != 'daily_mail':
+            # If the sentence contains either kind of double quotation, it contains a quotation of some sort
             if bool(re.search(r'[\“\"]', line.get('sentence'))) == True:
                 quotes.append(line)
                 text.remove(line)
+            # If the string begisn with either kind of double quotation mark, it is a quotation
+            elif bool(re.search(r'^“|^"', line.get('sentence'))) == True:
+                quotes.append(line)
+                text.remove(line)
         else:
+            # If the single quotation mark comes after/right before a blank space, this is a quotation mark, not an apostrophe
             if bool(re.search(r'''\s'|'\s''', line.get('sentence'))) == True:
                 quotes.append(line)
                 text.remove(line)
+            # If the string begisn with a single quotation mark, it is a quotation
             elif bool(re.search(r"^'", line.get('sentence'))) == True:
                 quotes.append(line)
                 text.remove(line)
     data = {'quotes': quotes, 'text': text}
+    return data
+
+def getStats(text):
+    """Return an object containing quotations from an article and the remaining sentences
+    """
+    stats = []
+    for line in text[:]:   # [:] Shallow copy the list since I'm manipulating the data as I'm iterating through stuff
+        # If string contains any digit. Originally I thought to try make a complicated regex to filter out 'covid-19' but this is actually useful too.
+        if bool(re.search(r'\d', line.get('sentence'))) == True:
+            stats.append(line)
+            text.remove(line)
+    data = {'stats': stats, 'text': text}
     return data

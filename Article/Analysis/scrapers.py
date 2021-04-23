@@ -5,6 +5,19 @@ from bs4 import BeautifulSoup as bs
 def isPhraseIn(phrase, text):
     return re.search(r"\b{}\b".format(phrase), text, re.IGNORECASE) is not None
 
+def getArticle(url):
+    if 'www.bbc' in url:
+        return bbc(url)
+
+    elif 'www.theg' in url:
+        return guardian(url)
+
+    elif 'news.sky' in url:
+        return sky(url)
+
+    elif 'www.dail' in url:
+        return daily_mail(url)
+
 # Separate clasess for each scraper. Returns body text without captions or other artifacts and the headline.
 class bbc:
     def __init__(self, url:str):
@@ -12,6 +25,7 @@ class bbc:
         self.soup = bs(article.content, "html.parser")
         self.body = self.get_body()
         self.title = self.get_title()
+        self.num_sentences = len(self.get_body())
         self.source = 'bbc'
         
     def get_body(self) -> list:
@@ -30,6 +44,7 @@ class guardian:
         self.soup = bs(article.content, "html.parser")
         self.body = self.get_body()
         self.title = self.get_title()
+        self.num_sentences = len(self.get_body())
         self.source = 'guardian'
         
     def get_body(self) -> list:
@@ -51,6 +66,7 @@ class sky:
         self.soup = bs(article.content, "html.parser")
         self.body = self.get_body()
         self.title = self.get_title()
+        self.num_sentences = len(self.get_body())
         self.source = 'sky'
 
     def get_body(self) -> list:
@@ -74,6 +90,7 @@ class daily_mail:
         self.soup = bs(article.content, "html.parser")
         self.body = self.get_body()
         self.title = self.get_title()
+        self.num_sentences = len(self.get_body())
         self.source = 'daily_mail'
         
     def get_body(self) -> list:

@@ -1,6 +1,6 @@
 # This code was originally made by Vishwa (@v1shwa) and can be found at https://github.com/v1shwa/document-similarity.
 # This code is used under the MIT License stated in the repository above.
-# Minor edits have been made for the purposes of this project.
+# Edits have been made for the purposes of this project.
 
 import numpy as np
 from .rss_feeds import sources
@@ -39,65 +39,8 @@ class DocSim:
             return 0
         return csim
 
-    # The original
-    def calculate_similarity(self, source_doc, target_docs=None, threshold=0):
-        """Calculates & returns similarity scores between given source document & all
-        the target documents."""
-        if not target_docs:
-            return []
-
-        if isinstance(target_docs, str):
-            target_docs = [target_docs]
-
-        source_vec = self.vectorize(source_doc)
-        results = []
-        for doc in target_docs:
-            target_vec = self.vectorize(doc)
-            sim_score = self._cosine_sim(source_vec, target_vec)
-            if sim_score > threshold:
-                #print("Result {} is higher than threshold".format(doc))
-                results.append({"score": sim_score, "doc": doc})
-            # Sort results by score in desc order
-            results.sort(key=lambda k: k["score"], reverse=True)
-
-        print("Finished calculating")
-        return results
-
-
-    # Legacy used in main.py
-    def calculateSimilarity(self, root_source, other_source, threshold=0):
-        # Add in the entire dataframe, use iterrows() here instead of the for loop
-        """Calculates & returns similarity scores between given source document & all
-        the target documents."""
-        source_vec = self.vectorize(root_source)
-        results = []
-        for index, row in other_source.iterrows():
-            target_vec = self.vectorize(row['title'])
-            sim_score = self._cosine_sim(source_vec, target_vec)
-            if sim_score > threshold:
-                #print("Result {} is higher than threshold".format(doc))
-                results.append({"score": sim_score, 
-                                "title": row['title'],
-                                "description": row['description'],
-                                "link": row['link'],
-                                "pubDate": row['pubDate'],
-                                "category": row['category'],
-                                "source": row['source']})
-            # Sort results by score in desc order
-            results.sort(key=lambda k: k["score"], reverse=True)
-        print("Finished calculating")
-        if len(results) == 0:
-            print('There were no matching articles above the threshold')
-        else:
-            test = other_source.iloc[0]
-            print('{}:'.format(test['source']))
-            for result in results:
-                print("Score:{}\nTitle:{}\nLink:{}\n".format(result.get('score'), result.get('title'), result.get('link')))
-            print('-----END-----')    
-        return results
-
     # This returns a dict in a similar structure to getData in the API
-    def calcSim(self, root_source, other_sources, threshold=0):
+    def collateArticles(self, root_source, other_sources, threshold=0):
         # Add in the entire dataframe, use iterrows() here instead of the for loop
         """Calculates & returns similarity scores between given source document & all
         the target documents."""
@@ -133,9 +76,11 @@ class DocSim:
 
         return data
 
-    def calculate_final(self, root_list, other_list, threshold=0):
-        quotations = []
-        sorted_quotations = []
+
+    def calculateSimilarity(self, data_type, root_list, other_list, threshold=0):
+
+        first_source = {'sorted_{}'.format(data_type): []}
+        second_source = {'sorted_{}'.format(data_type): []}
 
         # While root_list is not empty
         while root_list:
@@ -160,10 +105,13 @@ class DocSim:
                 results.sort(key=lambda k: k["score"], reverse=True)
 
             # Match the sentence with the highest similarity score
-            sorted_quotations.append({'root_quotation': root_quote, 'other_quotation': results[0]})
+            result_sentence = results[0].get('item').get('sentence')
+            result_index = results[0].get('item').get('position')
+            first_source.get('sorted_{}'.format(data_type)).append(root_list[0])
+            second_source.get('sorted_{}'.format(data_type)).append({'sentence': result_sentence, 'index': result_index, 'score': results[0].get('score')})
 
             # Secondary check to ensure that there won't be any out of bounds errors
-            if len(other_list) > 1:
+            if len(other_list) > 0:
                 other_list.remove(results[0].get('item'))
 
             # Remove the matched sentence from the root_list
@@ -171,8 +119,8 @@ class DocSim:
         
         # Conditions to handle unequal list sizes
         if len(root_list) > 0:
-            quotations.append({'sorted_quotations': sorted_quotations, 'unsorted_quotations_root': root_list})
+            first_source['unsorted_{}'.format(data_type)] = root_list
         elif len(other_list) > 0:
-            quotations.append({'sorted_quotations': sorted_quotations, 'unsorted_quotations_other': other_list})
+            second_source['unsorted_{}'.format(data_type)] = other_list
             
-        return quotations
+        return {'first_source': first_source, 'second_source': second_source}

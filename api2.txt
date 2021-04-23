@@ -1,0 +1,36 @@
+// Second plan of the API
+
+{
+    first_source: {
+        headline: 'headline',
+        num_sentences: 'num_sentences,
+        sorted_quotations: [
+            {sentence: 'sentence', index: 'index'},
+        ],
+        unsorted_quotations: [
+            {sentence: 'sentence', index: 'index'},
+        ],
+        sorted_sentences: [
+            {sentence: 'sentence', index: 'index'},
+        ],
+        unsorted_sentenes: [
+            {sentence: 'sentence', index: 'index'},
+        ],
+    },
+    second_source: {
+        headline: 'headline',
+        num_sentences: 'num_sentences,
+        sorted_quotations: [
+            {sentence: 'sentence', index: 'index', score: 'score'},
+        ],
+        unsorted_quotations: [
+            {sentence: 'sentence', index: 'index'},
+        ],
+        sorted_sentences: [
+
+        ],
+        unsorted_sentenes: [
+
+        ],
+    },
+}
