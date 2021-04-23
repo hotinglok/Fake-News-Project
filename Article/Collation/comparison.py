@@ -136,31 +136,40 @@ class DocSim:
     def calculate_final(self, root_list, other_list, threshold=0):
         quotations = []
         sorted_quotations = []
-        
+
+        # While root_list is not empty
         while root_list:
+            # Ensure that the loop won't be reading null from other_list
             if len(other_list) == 0:
                 break
+            
+            # Get the first sentence in root_list. Always true since the sentence is removed at the end of the for loop
             root_quote = root_list[0].get('sentence')
             source_vec = self.vectorize(root_quote)
+
+            # Temporary results list
             results = []
 
+            # For each sentence in other_list
             for item in other_list:
                 target_vec = self.vectorize(item.get('sentence'))
                 sim_score = self._cosine_sim(source_vec, target_vec)
                 if sim_score > threshold:
-                    #print("Result {} is higher than threshold".format(doc))
                     results.append({"score": sim_score, "item": item})
                 # Sort results by score in desc order
                 results.sort(key=lambda k: k["score"], reverse=True)
 
+            # Match the sentence with the highest similarity score
             sorted_quotations.append({'root_quotation': root_quote, 'other_quotation': results[0]})
+
+            # Secondary check to ensure that there won't be any out of bounds errors
             if len(other_list) > 1:
                 other_list.remove(results[0].get('item'))
 
-            for thing in other_list:
-                print(thing)
+            # Remove the matched sentence from the root_list
             root_list.remove(root_list[0])
         
+        # Conditions to handle unequal list sizes
         if len(root_list) > 0:
             quotations.append({'sorted_quotations': sorted_quotations, 'unsorted_quotations_root': root_list})
         elif len(other_list) > 0:
