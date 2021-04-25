@@ -44,6 +44,7 @@ class DocSim:
         # Add in the entire dataframe, use iterrows() here instead of the for loop
         """Calculates & returns similarity scores between given source document & all
         the target documents."""
+
         # This will just be a string
         source_vec = self.vectorize(root_source)
 
@@ -58,7 +59,7 @@ class DocSim:
                 sim_score = self._cosine_sim(source_vec, target_vec)
                 if sim_score > threshold:
                     #print("Result {} is higher than threshold".format(doc))
-                    results.append({"score": sim_score, 
+                    results.append({"score": float(sim_score), 
                                     "title": row['title'],
                                     "description": row['description'],
                                     "link": row['link'],
@@ -73,7 +74,6 @@ class DocSim:
             else:
                 source_name = source.get('name').lower().replace(' ', '_')
                 data['{}'.format(source_name)] = results
-
         return data
 
 
@@ -100,7 +100,7 @@ class DocSim:
                 target_vec = self.vectorize(item.get('sentence'))
                 sim_score = self._cosine_sim(source_vec, target_vec)
                 if sim_score > threshold:
-                    results.append({"score": sim_score, "item": item})
+                    results.append({"score": float(sim_score), "item": item})
                 # Sort results by score in desc order
                 results.sort(key=lambda k: k["score"], reverse=True)
 

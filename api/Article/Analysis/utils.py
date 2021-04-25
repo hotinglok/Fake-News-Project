@@ -1,11 +1,8 @@
 import re
 import os
 
-""" here = os.path.dirname(os.path.abspath(__file__))
-filename = os.path.join(here, 'stopwords-en.txt') """
-
 # Open the stopwords file and store as a list of separate words
-stopwords_path = 'y:/New Volume/Work & School/School/University of York/Year 4/Fake News/Code/Fake-News-Project/Article/Analysis/Resources/stopwords-en.txt'
+stopwords_path = './Article/Analysis/Resources/keywords_stopwords_en.txt'
 with open(stopwords_path) as f:
     stopwords = [line.rstrip() for line in f]
 

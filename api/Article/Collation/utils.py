@@ -71,6 +71,7 @@ def getData(keywords, date="none", extra_days=False):
     for source in sources:
         data = readData(source, con, date, extra_days)
         queried_data = searchData(data, keywords)
+        queried_data = queried_data.astype({'pubDate': 'string'})
         if queried_data.empty == True:
             continue
         else:

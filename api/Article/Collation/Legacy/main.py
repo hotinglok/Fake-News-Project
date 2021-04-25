@@ -35,6 +35,13 @@ del queried_sources[root_source_input]  # Remove chosen source from list so that
 #root_article_input = int(input("Select the index of the article to be used as the root article: "))
 root_article_input = 0
 root_article_row = queried_root_source.iloc[root_article_input]
+root_article = {'title':root_article_row['title'],
+                'description':root_article_row['description'],
+                'link':root_article_row['link'],
+                'pubDate':root_article_row['pubDate'],
+                'category':root_article_row['category'],
+                'source':root_article_row['source']}
+
 print("Root article title from {}: {}".format(root_article_row['source'], root_article_row['title']))
 
 # Doc-sim stuff
@@ -47,10 +54,9 @@ with open(stopwords_path, 'r') as fh:
 ds = DocSim(model,stopwords=stopwords)
 
 results = ds.collateArticles(root_article_row['title'], queried_sources)
+results['root_article'] = root_article
 print('Objects in results:')
 for key in results:
     print(key)
     print(results.get('{}'.format(key)))
 
-""" for source in queried_sources:
-    result = ds.calculateSimilarity(root_article_row['title'], source.get('data')) """
