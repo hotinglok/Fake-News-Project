@@ -2,8 +2,10 @@
 # This code is used under the MIT License stated in the repository above.
 # Edits have been made for the purposes of this project.
 
-import numpy as np
 from .rss_feeds import sources
+import numpy as np
+import re
+import string
 
 class DocSim:
     def __init__(self, w2v_model, stopwords=None):
@@ -17,18 +19,29 @@ class DocSim:
         :return:
         """
         doc = doc.lower()
-        words = [w for w in doc.split(" ") if w not in self.stopwords]
+        words = []
+        # Regex added since punctuation gets in the way
+        regex = re.compile('[^a-zA-Z]') # Only latin alphabetical characters
+
+        # doc.translate to remove all punctuation (though it doesn't catch punctuation pre/suffixed to words)
+        for word in doc.translate(str.maketrans(string.punctuation, ' '*len(string.punctuation))).split(" "):
+            word = regex.sub('', word)    # Gets rid of what the above can't catch
+            if word not in self.stopwords:
+                if word != '':
+                    words.append(word)
+
         word_vecs = []
         for word in words:
             try:
                 vec = self.w2v_model[word]
                 word_vecs.append(vec)
             except KeyError:
+                print(word)
                 # Ignore, if the word doesn't exist in the vocabulary
                 pass
 
         # Assuming that document vector is the mean of all the word vectors
-        # PS: There are other & better ways to do it.
+        # PS: There are other & better ways to do it. -@hotinglok comment: I don't know if there is for general use cases.
         vector = np.mean(word_vecs, axis=0)
         return vector
 

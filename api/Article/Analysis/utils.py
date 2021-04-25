@@ -2,7 +2,9 @@ import re
 import os
 
 # Open the stopwords file and store as a list of separate words
-stopwords_path = './Article/Analysis/Resources/keywords_stopwords_en.txt'
+
+
+stopwords_path = './api/Article/Analysis/Resources/keywords_stopwords_en.txt'
 with open(stopwords_path) as f:
     stopwords = [line.rstrip() for line in f]
 

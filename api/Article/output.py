@@ -5,8 +5,8 @@ from .Collation.comparison import DocSim
 from gensim.models.keyedvectors import KeyedVectors
 
 # DocSim setup
-googlenews_model_path = './Article/Collation/Resources/GoogleNews-vectors-negative300.bin'
-stopwords_path = "./Article/Collation/Resources/docsim_stopwords_en.txt"
+googlenews_model_path = './api//Article/Collation/Resources/GoogleNews-vectors-negative300.bin'
+stopwords_path = "./api/Article/Collation/Resources/docsim_stopwords_en.txt"
 model = KeyedVectors.load_word2vec_format(googlenews_model_path, binary=True)
 with open(stopwords_path, 'r') as fh:
     stopwords = fh.read().split(",")
