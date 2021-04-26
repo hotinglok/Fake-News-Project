@@ -94,6 +94,13 @@ class DocSim:
 
         first_source = {'sorted_{}'.format(data_type): []}
         second_source = {'sorted_{}'.format(data_type): []}
+        swapped = False
+        # Check which list is shorter. If the other list is shorter, swap the values
+        if len(other_list) < len(root_list):
+            temp = root_list
+            root_list = other_list
+            other_list = temp
+            swapped = True
 
         # While root_list is not empty
         while root_list:
@@ -113,15 +120,21 @@ class DocSim:
                 target_vec = self.vectorize(item.get('sentence'))
                 sim_score = self._cosine_sim(source_vec, target_vec)
                 if sim_score > threshold:
-                    results.append({"score": float(sim_score), "item": item})
+                    results.append({"score": sim_score, "item": item})
                 # Sort results by score in desc order
                 results.sort(key=lambda k: k["score"], reverse=True)
 
             # Match the sentence with the highest similarity score
             result_sentence = results[0].get('item').get('sentence')
             result_index = results[0].get('item').get('position')
-            first_source.get('sorted_{}'.format(data_type)).append(root_list[0])
-            second_source.get('sorted_{}'.format(data_type)).append({'sentence': result_sentence, 'index': result_index, 'score': results[0].get('score')})
+
+            # Remove matched pair from respective lists
+            if swapped == True:
+                first_source.get('sorted_{}'.format(data_type)).append({'sentence': result_sentence, 'index': result_index, 'score': results[0].get('score')})
+                second_source.get('sorted_{}'.format(data_type)).append(root_list[0])
+            else:
+                first_source.get('sorted_{}'.format(data_type)).append(root_list[0])
+                second_source.get('sorted_{}'.format(data_type)).append({'sentence': result_sentence, 'index': result_index, 'score': results[0].get('score')})
 
             # Secondary check to ensure that there won't be any out of bounds errors
             if len(other_list) > 0:
@@ -132,8 +145,14 @@ class DocSim:
         
         # Conditions to handle unequal list sizes
         if len(root_list) > 0:
-            first_source['unsorted_{}'.format(data_type)] = root_list
+            if swapped == True:
+                first_source['unsorted_{}'.format(data_type)] = other_list
+            else:
+                first_source['unsorted_{}'.format(data_type)] = root_list
         elif len(other_list) > 0:
-            second_source['unsorted_{}'.format(data_type)] = other_list
+            if swapped == True:
+                second_source['unsorted_{}'.format(data_type)] = root_list
+            else:
+                second_source['unsorted_{}'.format(data_type)] = other_list
             
         return {'first_source': first_source, 'second_source': second_source}

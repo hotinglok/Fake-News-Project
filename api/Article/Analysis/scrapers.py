@@ -24,6 +24,7 @@ class bbc:
         article = requests.get(url)
         self.soup = bs(article.content, "html.parser")
         self.body = self.get_body()
+        self.article = self.get_article()
         self.title = self.get_title()
         self.num_sentences = len(self.get_body())
         self.source = 'bbc'
@@ -35,6 +36,13 @@ class bbc:
             sentences.append({'sentence': p.text, 'position': index})
         return sentences
     
+    def get_article(self) -> list:
+        body = self.soup.find(class_="ssrcss-5h7eao-ArticleWrapper e1nh2i2l0")
+        sentences = []
+        for index, p in enumerate(body.find_all('div', attrs={'data-component':"text-block"} )):
+            sentences.append(p.text)
+        return sentences
+
     def get_title(self) -> str:
         return self.soup.find(class_="ssrcss-1pl2zfy-StyledHeading e1fj1fc10").text
 
@@ -43,6 +51,7 @@ class guardian:
         article = requests.get(url)
         self.soup = bs(article.content, "html.parser")
         self.body = self.get_body()
+        self.article = self.get_article()
         self.title = self.get_title()
         self.num_sentences = len(self.get_body())
         self.source = 'guardian'
@@ -56,6 +65,16 @@ class guardian:
             else:
                 sentences.append({'sentence': p.text, 'position': index})
         return sentences
+
+    def get_article(self) -> list:
+        body = self.soup.find(class_="article-body-commercial-selector css-79elbk article-body-viewer-selector")
+        sentences = []
+        for index, p in enumerate(body):
+            if p.text =='': # Guardian has a strange <p> block with no contents called 'sign-in-gate'.
+                continue
+            else:
+                sentences.append(p.text)
+        return sentences
     
     def get_title(self) -> str:
         return self.soup.find(class_="css-1nupfq9").text
@@ -65,6 +84,7 @@ class sky:
         article = requests.get(url)
         self.soup = bs(article.content, "html.parser")
         self.body = self.get_body()
+        self.article = self.get_article()
         self.title = self.get_title()
         self.num_sentences = len(self.get_body())
         self.source = 'sky'
@@ -80,6 +100,18 @@ class sky:
             else:
                 sentences.append({'sentence': p.text, 'position': index})
         return sentences
+
+    def get_article(self) -> list:
+        body = self.soup.find(class_="sdc-article-body sdc-article-body--story sdc-article-body--lead")
+        sentences = []
+        for index, p in enumerate(body.find_all('p')):
+            if p.text ==' ': # Random gap, not sure where it is.
+                continue
+            elif isPhraseIn('live updates from the UK and around the world', p.text) == True:
+                continue
+            else:
+                sentences.append(p.text)
+        return sentences
     
     def get_title(self) -> str:
         return self.soup.find(class_="sdc-article-header__long-title").text
@@ -89,6 +121,7 @@ class daily_mail:
         article = requests.get(url)
         self.soup = bs(article.content, "html.parser")
         self.body = self.get_body()
+        self.article = self.get_article()
         self.title = self.get_title()
         self.num_sentences = len(self.get_body())
         self.source = 'daily_mail'
@@ -102,6 +135,17 @@ class daily_mail:
         sentences = []
         for index, p in enumerate(body.find_all('p', attrs={'class':"mol-para-with-font"})):
             sentences.append({'sentence': p.text, 'position': index})
+        return sentences
+
+    def get_article(self) -> list:
+        body = self.soup.find('div', attrs={'itemprop':"articleBody"})
+        # Daily Mail has 'fact box news' blocks with extra information. As these summaries and extra bits aren't present in other sources, they are excluded
+        for div in body.find_all('div', attrs={'class':'art-ins mol-factbox news', 'class':'art-ins mol-factbox floatRHS news'}):
+            div.decompose()
+
+        sentences = []
+        for index, p in enumerate(body.find_all('p', attrs={'class':"mol-para-with-font"})):
+            sentences.append(p.text)
         return sentences
     
     def get_title(self) -> str:

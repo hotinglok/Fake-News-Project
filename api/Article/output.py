@@ -3,10 +3,12 @@ from .Analysis.utils import getKeywords, getQuotes, getStats
 from .Collation.utils import getData
 from .Collation.comparison import DocSim
 from gensim.models.keyedvectors import KeyedVectors
+import os
 
 # DocSim setup
-googlenews_model_path = './api//Article/Collation/Resources/GoogleNews-vectors-negative300.bin'
-stopwords_path = "./api/Article/Collation/Resources/docsim_stopwords_en.txt"
+dirname = os.path.dirname(__file__)
+stopwords_path = os.path.join(dirname, './Collation/Resources/stopwords_en.txt')
+googlenews_model_path = os.path.join(dirname, './Collation/Resources/GoogleNews-vectors-negative300.bin')
 model = KeyedVectors.load_word2vec_format(googlenews_model_path, binary=True)
 with open(stopwords_path, 'r') as fh:
     stopwords = fh.read().split(",")
@@ -51,7 +53,6 @@ def analyseArticles(url1, url2):
     data['first_source'] = sorted_quotes.get('first_source')
     data['second_source'] = sorted_quotes.get('second_source')
 
-
     # Get sentences containing numbers from the remaining text, separate from text
     first_stats = getStats(first_quotes.get('text'))
     second_stats = getStats(second_quotes.get('text'))
@@ -70,13 +71,18 @@ def analyseArticles(url1, url2):
     data.get('first_source')['unsorted_text'] = sorted_text.get('first_source').get('unsorted_text')
     data.get('second_source')['sorted_text'] = sorted_text.get('second_source').get('sorted_text')
     data.get('second_source')['unsorted_text'] = sorted_text.get('second_source').get('unsorted_text')
+    
+    # Get keywords
+    first_keywords = getKeywords(first_source_link.article)
+    second_keywords = getKeywords(second_source_link.article)
+    # Add keywords to final payload
+    data.get('first_source')['keywords'] = first_keywords
+    data.get('second_source')['keywords'] = second_keywords
 
     # Add final details
     data.get('first_source')['headline'] = first_source_link.title
     data.get('first_source')['num_sentences'] = first_source_link.num_sentences
-    data.get('first_source')['link'] = url1
     data.get('second_source')['headline'] = second_source_link.title
     data.get('second_source')['num_sentences'] = second_source_link.num_sentences
-    data.get('second_source')['link'] = url2
 
     return data

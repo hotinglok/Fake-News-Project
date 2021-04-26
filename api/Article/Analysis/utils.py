@@ -2,9 +2,8 @@ import re
 import os
 
 # Open the stopwords file and store as a list of separate words
-
-
-stopwords_path = './api/Article/Analysis/Resources/keywords_stopwords_en.txt'
+dirname = os.path.dirname(__file__)
+stopwords_path = os.path.join(dirname, './Resources/stopwords_en.txt')
 with open(stopwords_path) as f:
     stopwords = [line.rstrip() for line in f]
 
@@ -19,17 +18,17 @@ def split_words(text):
         return None
 
 
-def getKeywords(text, num_keywords=10):
+def getKeywords(article, num_keywords=10):
     """Get the top 10 keywords and their frequency scores ignores blacklisted
     words in stopwords, counts the number of occurrences of each word, and
     sorts them in reverse natural order (so descending) by number of
     occurrences.
     """
+    text = " ".join(article)
+    
     NUM_KEYWORDS = num_keywords
     text = split_words(text)
-    # of words before removing blacklist words
 
-    #num_words = len(text)
     text = [x for x in text if x not in stopwords]
     freq = {}
     for word in text:
@@ -43,13 +42,12 @@ def getKeywords(text, num_keywords=10):
                         key=lambda x: (x[1], x[0]),
                         reverse=True)
     keywords = keywords[:min_size]
-    keywords = dict((x, y) for x, y in keywords)
-    return keywords
 
-"""         for k in keywords:
-            articleScore = keywords[k] * 1.0 / max(num_words, 1)
-            keywords[k] = articleScore * 1.5 + 1
-        return dict(keywords) """
+    data = []
+    for pair in keywords:
+        data.append({'keyword':pair[0], 'frequency':pair[1]})
+
+    return data
 
 def getQuotes(url):
     """Return an object containing quotation from an article and the remaining sentences
@@ -63,7 +61,7 @@ def getQuotes(url):
                 quotes.append(line)
                 text.remove(line)
             # If the string begisn with either kind of double quotation mark, it is a quotation
-            elif bool(re.search(r'^“|^"', line.get('sentence'))) == True:
+            elif bool(re.search(r'''^“|^"''', line.get('sentence'))) == True:
                 quotes.append(line)
                 text.remove(line)
         else:
