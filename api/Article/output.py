@@ -23,16 +23,16 @@ def compareHeadlines(keywords, date, extra_days, root_source_input, root_article
 
     # Select a root article to compare other articles to
     root_article_row = queried_root_source.iloc[root_article_input]
-
-    root_article = {'title': root_article_row['title'], 
+    root_article_source = root_article_row['source'].lower().replace(' ', '_')
+    root_article = [{'title': root_article_row['title'], 
                     'description': root_article_row['description'], 
                     'link': root_article_row['link'], 
                     'pubDate': root_article_row['pubDate'],
                     'category': root_article_row['category'],
-                    'source': root_article_row['source']}
+                    'source': root_article_row['source']}]
 
     results = ds.collateArticles(root_article_row['title'], queried_sources)
-    results['root_article'] = root_article
+    results['{}'.format(root_article_source)] = root_article
     return results
 
 # Final function

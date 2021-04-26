@@ -51,13 +51,7 @@ def searchData(data, search):
 
     # Add queried data to an array if matches are returned
     matches_df = data.iloc[matches]
-    if matches_df.empty == True:
-        print("{} has no articles with the keyword(s) in this date range".format(source_name))
-        return matches_df
-    else:
-        print("{} has {} article(s) containing the keyword(s)".format(source_name, len(matches_df.index)))
-        print(matches_df)
-        return matches_df
+    return matches_df
 
 # Same loop that was previously in main. Converted into a function so I don't need to make multiple connections.
 def getData(keywords, date="none", extra_days=False):
@@ -79,6 +73,6 @@ def getData(keywords, date="none", extra_days=False):
             queried_sources.append({"name": source.name, "data": queried_data}) # Tuple for convenience.
     
     if matches > 15:
-        print("There are {} articles containing the keywords. The comparisson may take a while unless you can specify the headline further.".format(matches))
+        print("There are {} articles containing the keywords. The comparison may take a while unless you can specify the headline further.".format(matches))
     return queried_sources
         

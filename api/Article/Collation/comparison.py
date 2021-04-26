@@ -71,7 +71,6 @@ class DocSim:
                 target_vec = self.vectorize(row['title'])
                 sim_score = self._cosine_sim(source_vec, target_vec)
                 if sim_score > threshold:
-                    #print("Result {} is higher than threshold".format(doc))
                     results.append({"score": float(sim_score), 
                                     "title": row['title'],
                                     "description": row['description'],
@@ -120,7 +119,7 @@ class DocSim:
                 target_vec = self.vectorize(item.get('sentence'))
                 sim_score = self._cosine_sim(source_vec, target_vec)
                 if sim_score > threshold:
-                    results.append({"score": sim_score, "item": item})
+                    results.append({"score": float(sim_score), "item": item})
                 # Sort results by score in desc order
                 results.sort(key=lambda k: k["score"], reverse=True)
 
