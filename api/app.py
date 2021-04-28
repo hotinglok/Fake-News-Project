@@ -11,7 +11,7 @@ import os
 app = Flask(__name__)
 app.secret_key = "hello"
 
-@app.route('/api/v1.0/search', methods=['POST'])
+@app.route('/api/v1.0/search', methods=['GET'])
 def collationSearch():
     """Return a sanity check response from the Cloud SQL db in JSON format"""
     # User input keywords and a date
@@ -44,7 +44,7 @@ def collationSearch():
 
     return response
 
-@app.route('/api/v1.0/compare', methods=['POST'])
+@app.route('/api/v1.0/compare', methods=['GET'])
 def collationResults():     
 
     keywords = session.get('search_data').get('keywords')
@@ -61,7 +61,7 @@ def collationResults():
 
     return response
 
-@app.route('/api/v1.0/results', methods=['POST'])
+@app.route('/api/v1.0/results', methods=['GET'])
 def analysisResults():     
 
     link1 = request.args.get('link1')

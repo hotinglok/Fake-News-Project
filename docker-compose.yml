@@ -14,10 +14,10 @@ services:
 
   client:
     build: client
-    command: ["npm", "start"]
+    command: ["npm", "run", "dev"]
     volumes:
       - ./client:/frontend
-      - node-modules:/frontend/node_modules
+      - /frontend/node_modules
     environment:
       - NODE_ENV=development
     ports:
