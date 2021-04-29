@@ -11,6 +11,39 @@ import os
 app = Flask(__name__)
 app.secret_key = "hello"
 
+@app.route('/api/v1.0/test', methods=['GET'])
+def test():
+    """Return a sanity check response from the Cloud SQL db in JSON format"""
+    # User input keywords and a date
+    keywords = "prince philip"
+    date = "2021-04-16"
+    extra_days = False
+
+    # Store the input terms to be used in later requests
+    search_vars = {'keywords': keywords, 'date': date, 'extra_days': extra_days}
+    session['search_data'] = search_vars
+
+    # Get articles from each source containing keywords at the given date
+    queried_sources = getData(keywords, date, extra_days)
+    data = {}
+
+    for source in queried_sources:
+        source_name = source.get('name').lower().replace(' ', '_')
+        source_data = source.get('data').reset_index().to_dict(orient='records')
+        data['{}'.format(source_name)] = source_data
+    
+    response = make_response(jsonify(data))
+
+    # Add Access-Control-Allow-Origin header to allow cross-site request
+    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+    
+
+    # Mozilla provides good references for Access Control at:
+    # https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+    # https://developer.mozilla.org/en-US/docs/Web/HTTP/Server-Side_Access_Control
+
+    return response
+
 @app.route('/api/v1.0/search', methods=['GET'])
 def collationSearch():
     """Return a sanity check response from the Cloud SQL db in JSON format"""
