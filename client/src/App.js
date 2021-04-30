@@ -1,49 +1,55 @@
-import React, {useEffect, useState} from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import Analysis from "./Sections/Anaysis"
+import axios from 'axios'
 
-function App() {
-  const [error, setError] = useState(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [items, setItems] = useState([]);
 
-  // Note: the empty deps array [] means
-  // this useEffect will run once
-  // similar to componentDidMount()
-  useEffect(() => {
-    fetch("http://localhost:5000/api/v1.0/test")
-      .then(res => res.json())
-      .then(
-        (result) => {
-          setIsLoaded(true);
-          setItems(result);
-        },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {
-          setIsLoaded(true);
-          setError(error);
-        }
-      )
-  }, [])
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  } else if (!isLoaded) {
-    return <div>Loading...</div>;
-  } else {
-    return (
-      console.log('items', items),
-      <ul>
-        {items.map(item => (
-          <li key={item.title}>
-            {item.title}
-          </li>
-        ))}
-      </ul>
-    );
-  }
+export default function App() {
+  return (
+    <div className="App">
+      <State />
+    </div>
+  );
 }
-
-export default App;
+const State = () => {
+  const [userData, updateUserData] = useState({});
+  const [section, updateSection] = useState(0);
+  const fetchUserData = () => {
+    axios.get('http://localhost:5000/api/v1.0/test').then(resp => {
+      console.log(resp.data);
+    });
+    const data = { name: "Name", email: "name@email.com" };
+    updateUserData(data);
+    updateSection(1);
+  };
+  const compareLinks = () => {
+    // call an API
+    // const data = fetch(.....)
+    updateSection(2);
+  };
+  return (
+    <>
+      <Header userData={userData} />
+      {section === 0 && <InitialView fetchUserData={fetchUserData} />}
+      {section === 1 && (
+        <UserView compareLinks={compareLinks}/>
+      )}
+      {section === 2 && (
+        <Analysis/>
+      )}
+    </>
+  );
+};
+const InitialView = ({ fetchUserData }) => {
+  return <button onClick={fetchUserData}>Fetch your data!</button>;
+};
+const UserView = ({ userData, compareLinks }) => {
+  return (
+    <>
+      <div>{JSON.stringify(userData)}</div>
+      <button onClick={compareLinks}>Update the data</button>
+    </>
+  );
+};
+const Header = ({ userData }) => {
+  return <header>Hi, {userData.name}</header>;
+};
