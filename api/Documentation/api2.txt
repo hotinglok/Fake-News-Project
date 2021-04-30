@@ -1,51 +1,36 @@
-// Third plan of the API
+// Second plan of the API
 
 {
     first_source: {
         headline: 'headline',
         num_sentences: 'num_sentences,
-        keywords: [
-            {'keyword': keyword, 'frequency': frequency}
-        ]
         sorted_quotations: [
-            {'sentence': sentence, 'index': index},
+            {sentence: 'sentence', index: 'index'},
         ],
         unsorted_quotations: [
-            {'sentence': sentence, 'index': index},
+            {sentence: 'sentence', index: 'index'},
         ],
-        sorted_stats: [
-            {'sentence': sentence, 'index': index, 'score': score},
+        sorted_sentences: [
+            {sentence: 'sentence', index: 'index'},
         ],
-        unsorted_stats: [
-            {'sentence': sentence, 'index': index},
-        ],
-        sorted_text: [
-            {'sentence': sentence, 'index': index},
-        ],
-        unsorted_text: [
-            {'sentence': sentence, 'index': index},
+        unsorted_sentenes: [
+            {sentence: 'sentence', index: 'index'},
         ],
     },
     second_source: {
         headline: 'headline',
         num_sentences: 'num_sentences,
         sorted_quotations: [
-            {'sentence': sentence, 'index': index, 'score': score},
+            {sentence: 'sentence', index: 'index', score: 'score'},
         ],
         unsorted_quotations: [
-            {'sentence': sentence, 'index': index},
+            {sentence: 'sentence', index: 'index'},
         ],
-        sorted_stats: [
-            {'sentence': sentence, 'index': index},
+        sorted_sentences: [
+
         ],
-        unsorted_stats: [
-            {'sentence': sentence, 'index': index},
-        ],
-        sorted_text: [
-            {'sentence': sentence, 'index': index, 'score': score},
-        ],
-        unsorted_text: [
-            {'sentence': sentence, 'index': index},
+        unsorted_sentenes: [
+
         ],
     },
 }
