@@ -14,7 +14,7 @@ services:
 
   client:
     build: client
-    command: ["npm", "run", "dev"]
+    command: ["yarn", "start"]
     volumes:
       - ./client:/frontend
       - /frontend/node_modules
