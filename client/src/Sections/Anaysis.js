@@ -123,7 +123,7 @@ const onDragEnd = (result, columns, setColumns) => {
   }
 };
 
-function Analysis() {
+function AnalysisView() {
   const [columns, setColumns] = useState(columnsFromBackend);
   return (
     <div style={{ display: "grid", 
@@ -208,4 +208,4 @@ function Analysis() {
   );
 }
 
-export default Analysis;
+export default AnalysisView;
