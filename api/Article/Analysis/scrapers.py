@@ -28,6 +28,7 @@ class bbc:
         self.title = self.get_title()
         self.num_sentences = len(self.get_body())
         self.source = 'bbc'
+        self.name = 'BBC News'
         
     def get_body(self) -> list:
         body = self.soup.find(class_="ssrcss-5h7eao-ArticleWrapper e1nh2i2l0")
@@ -55,6 +56,7 @@ class guardian:
         self.title = self.get_title()
         self.num_sentences = len(self.get_body())
         self.source = 'guardian'
+        self.name = 'The Guardian'
         
     def get_body(self) -> list:
         body = self.soup.find(class_="article-body-commercial-selector css-79elbk article-body-viewer-selector")
@@ -88,6 +90,7 @@ class sky:
         self.title = self.get_title()
         self.num_sentences = len(self.get_body())
         self.source = 'sky'
+        self.name = 'Sky News'
 
     def get_body(self) -> list:
         body = self.soup.find(class_="sdc-article-body sdc-article-body--story sdc-article-body--lead")
@@ -125,6 +128,7 @@ class daily_mail:
         self.title = self.get_title()
         self.num_sentences = len(self.get_body())
         self.source = 'daily_mail'
+        self.name = 'Daily Mail'
         
     def get_body(self) -> list:
         body = self.soup.find('div', attrs={'itemprop':"articleBody"})

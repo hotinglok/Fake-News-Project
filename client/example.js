@@ -11,6 +11,7 @@ export default function App() {
 const State = () => {
   const [userData, updateUserData] = useState({});
   const [stage, updateStage] = useState(0);
+  
   const fetchUserData = () => {
     // call an API
     // const data = fetch(.....)

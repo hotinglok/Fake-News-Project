@@ -73,8 +73,8 @@ def analyseArticles(url1, url2):
     data.get('second_source')['unsorted_text'] = sorted_text.get('second_source').get('unsorted_text')
     
     # Get keywords
-    first_keywords = getKeywords(first_source_link.article)
-    second_keywords = getKeywords(second_source_link.article)
+    first_keywords = getKeywords(first_source_link.article, 9)
+    second_keywords = getKeywords(second_source_link.article, 9)
     # Add keywords to final payload
     data.get('first_source')['keywords'] = first_keywords
     data.get('second_source')['keywords'] = second_keywords
@@ -82,7 +82,9 @@ def analyseArticles(url1, url2):
     # Add final details
     data.get('first_source')['headline'] = first_source_link.title
     data.get('first_source')['num_sentences'] = first_source_link.num_sentences
+    data.get('first_source')['source'] = first_source_link.name
     data.get('second_source')['headline'] = second_source_link.title
     data.get('second_source')['num_sentences'] = second_source_link.num_sentences
+    data.get('second_source')['source'] = second_source_link.name
 
     return data

@@ -1,90 +1,47 @@
 import React, { useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { Paper, Typography, makeStyles } from '@material-ui/core';
 import { v4 as uuid } from 'uuid';
+import DummyAnalysis from '../Dummy/AnalysisResults'
 
-const itemsFromBackend = [
-  { id: uuid(), content: "First task" },
-  { id: uuid(), content: "Second task" },
-  { id: uuid(), content: "Third task" },
-  { id: uuid(), content: "Fourth task" },
-  { id: uuid(), content: "The Duke of Edinburgh's link to the Navy and love of the sea will be a focus at the Windsor service." },
-  { id: uuid(), content: "Fifth task" },
-  { id: uuid(), content: "Fifth task" },
-  { id: uuid(), content: "Fifth task" },
-  { id: uuid(), content: "Fifth task" },
-  { id: uuid(), content: "Fifth task" },
-];
-
-const columnsFromBackend = {
-  [uuid()]: {
-    name: "Headlines",
-    items: itemsFromBackend
-  },
-  [uuid()]: {
-    name: "Headlines",
-    items: []
-  },
-  [uuid()]: {
-    name: "Keywords",
-    items: []
-  },
-  [uuid()]: {
-    name: "Keywords",
-    items: []
-  },
-  [uuid()]: {
-    name: "Sorted Quotations",
-    items: []
-  },
-  [uuid()]: {
-    name: "Sorted Quotations",
-    items: []
-  },
-  [uuid()]: {
-    name: "Unsorted Quotations",
-    items: []
-  },
-  [uuid()]: {
-    name: "Unsorted Quotations",
-    items: []
-  },
-  [uuid()]: {
-    name: "Sorted Stats",
-    items: []
-  },
-  [uuid()]: {
-    name: "Sorted Stats",
-    items: []
-  },
-  [uuid()]: {
-    name: "Unsorted Stats",
-    items: []
-  },
-  [uuid()]: {
-    name: "Unsorted Stats",
-    items: []
-  },
-  [uuid()]: {
-    name: "Sorted Text",
-    items: []
-  },
-  [uuid()]: {
-    name: "Sorted Text",
-    items: []
-  },
-  [uuid()]: {
-    name: "Unsorted Text",
-    items: []
-  },
-  [uuid()]: {
-    name: "Unsorted Text",
-    items: []
-  },
-  [uuid()]: {
-    name: "Irrelevant",
-    items: []
+const useStyles = makeStyles(theme => ({
+  paper: {
+      userSelect: "none",
+      fontSize: "14px",
+      color: "#212121",
+      padding: 16,
+      border: "2px",
+      borderRadius: "12px",
+      margin: "0 0 12px 0",
+      minHeight: "8rem",
+      backgroundColor: "#ffffff",
+      transition: "background 0.2s",
+      '&:active': {
+        backgroundColor: '#fff9c4'
+    }
   }
-};
+}));
+
+function AddUUID(data){
+  const test = data
+  const result = []
+  for(var i in test){
+    test[i].id = uuid();
+    result.push(test[i])
+  }
+  return(result)
+}
+
+function getStyle(style) {
+  if (style?.transform) {
+    const axisLockY = `translate(0px, ${style.transform.split(',').pop()}`;
+    return {
+      ...style,
+      transform: axisLockY,
+    };
+  }
+  return style;
+}
 
 const onDragEnd = (result, columns, setColumns) => {
   if (!result.destination) return;
@@ -123,11 +80,70 @@ const onDragEnd = (result, columns, setColumns) => {
   }
 };
 
-function AnalysisView() {
-  const [columns, setColumns] = useState(columnsFromBackend);
+export const AnalysisView = ({ data }) => {
+  const columnsFromAPI = {
+    [uuid()]: {
+      name: "Sorted Quotations",
+      items: AddUUID(data.first_source.sorted_quotations)
+    },
+    [uuid()]: {
+      name: "Sorted Quotations",
+      items: AddUUID(data.second_source.sorted_quotations)
+    },
+    [uuid()]: {
+      name: "Unsorted Quotations",
+      items: AddUUID(data.first_source.unsorted_quotations)
+    },
+    [uuid()]: {
+      name: "Unsorted Quotations",
+      items: AddUUID(data.second_source.unsorted_quotations)
+    },
+    [uuid()]: {
+      name: "Sorted Stats",
+      items: AddUUID(data.first_source.sorted_stats)
+    },
+    [uuid()]: {
+      name: "Sorted Stats",
+      items: AddUUID(data.second_source.sorted_stats)
+    },
+    [uuid()]: {
+      name: "Unsorted Stats",
+      items: AddUUID(data.first_source.unsorted_stats)
+    },
+    [uuid()]: {
+      name: "Unsorted Stats",
+      items: AddUUID(data.second_source.unsorted_stats)
+    },
+    [uuid()]: {
+      name: "Sorted Text",
+      items: AddUUID(data.first_source.sorted_text)
+    },
+    [uuid()]: {
+      name: "Sorted Text",
+      items: AddUUID(data.second_source.sorted_stats)
+    },
+    [uuid()]: {
+      name: "Unsorted Text",
+      items: AddUUID(data.first_source.unsorted_text)
+    },
+    [uuid()]: {
+      name: "Unsorted Text",
+      items: AddUUID(data.second_source.unsorted_text)
+    },
+    [uuid()]: {
+      name: "Irrelevant",
+      items: []
+    },
+    [uuid()]: {
+      name: "Irrelevant",
+      items: []
+    }
+  };
+  const [columns, setColumns] = useState(columnsFromAPI);
+  const classes = useStyles();
   return (
     <div style={{ display: "grid", 
-                  gridTemplateColumns: "240px 240px",
+                  gridTemplateColumns: "1fr 1fr",
                   gridGap: "3rem",
                   justifyContent: "center", 
                   height: "100%" }}>
@@ -144,7 +160,7 @@ function AnalysisView() {
               }}
               key={columnId}
             >
-              <h2>{column.name}</h2>
+              <Typography variant="h4" component="h2" style={{paddingBottom: "5px"}}>{column.name}</Typography>
               <div >
                 <Droppable droppableId={columnId} key={columnId}>
                   {(provided, snapshot) => {
@@ -156,9 +172,11 @@ function AnalysisView() {
                           background: snapshot.isDraggingOver
                             ? "lightblue"
                             : "lightgrey",
-                          padding: 4,
-                          width: 250,
-                          minHeight: 500
+                          padding: "10px 10px 2px 10px",
+                          border: "1px",
+                          borderRadius: "12px",
+                          width: "40rem",
+                          minHeight: "10.2rem",
                         }}
                       >
                         {column.items.map((item, index) => {
@@ -170,25 +188,17 @@ function AnalysisView() {
                             >
                               {(provided, snapshot) => {
                                 return (
-                                  <div
+                                  <Paper
+                                    elevation={3}
                                     ref={provided.innerRef}
                                     {...provided.draggableProps}
                                     {...provided.dragHandleProps}
-                                    style={{
-                                      userSelect: "none",
-                                      fontSize: "12px",
-                                      padding: 16,
-                                      margin: "0 0 8px 0",
-                                      minHeight: "50px",
-                                      backgroundColor: snapshot.isDragging
-                                        ? "#263B4A"
-                                        : "#456C86",
-                                      color: "white",
-                                      ...provided.draggableProps.style
-                                    }}
+                                    className={classes.paper}
+                                    style={getStyle(provided.draggableProps.style, snapshot)}
                                   >
-                                    {item.content}
-                                  </div>
+                                    {console.log(item)}
+                                    {item.sentence}
+                                  </Paper>
                                 );
                               }}
                             </Draggable>
