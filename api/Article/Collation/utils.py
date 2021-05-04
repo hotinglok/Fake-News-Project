@@ -32,6 +32,9 @@ def readData(source, con, date="none", extra_days=False):
 def searchData(data, search):
     keywords = search.lower().split()
     keywords_string = "|".join(keywords)
+    if len(data) < 1:
+        matches_df = []
+        return matches_df
     source_name = data['source'].iloc[0]
 
     # For each selected column, make all entries lowercase and return true where rows contain keywords.

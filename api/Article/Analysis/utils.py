@@ -17,7 +17,6 @@ def split_words(text):
     except TypeError:
         return None
 
-
 def getKeywords(article, num_keywords=10):
     """Get the top 10 keywords and their frequency scores ignores blacklisted
     words in stopwords, counts the number of occurrences of each word, and
@@ -28,7 +27,7 @@ def getKeywords(article, num_keywords=10):
     
     NUM_KEYWORDS = num_keywords
     text = split_words(text)
-
+    
     text = [x for x in text if x not in stopwords]
     freq = {}
     for word in text:

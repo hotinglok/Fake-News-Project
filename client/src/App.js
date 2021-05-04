@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import AnalysisView from "./Sections/Anaysis"
 import axios from 'axios'
+import CircularProgress from '@material-ui/core/CircularProgress'
 import { SearchView }  from "./Sections/Search"
 import { ArticlesView } from "./Sections/Articles"
+import { ArticleSelectView } from "./Sections/Select"
+import DummySearch from "./Dummy/SearchResults"
+import DummyCompare from "./Dummy/CompareResults"
+import DummyAnalysis from "./Dummy/AnalysisResults";
 
 export default function App() {
   return (
@@ -11,64 +16,89 @@ export default function App() {
     </div>
   );
 }
+
 const State = () => {
-  const [userData, updateUserData] = useState({});
-  const [globalData, updateData] = useState({})
+  const [searchData, updateSearchData] = useState({});
+  const [globalData, updateData] = useState({});
   const [section, updateSection] = useState(0);
 
-  const fetchUserData = () => {
-    axios.get(`http://localhost:5000/api/v1.0/test`).then(resp => {
-      console.log(resp.data);
-    });
-    const data = { name: "Name", email: "name@email.com" };
-    updateUserData(data);
-    updateSection(1);
+  const dummySearchKeywords = ( keywords, date, extra_days ) => {
+    const searchTerms = {keywords: keywords, date: date, extra_days: extra_days}
+    updateSearchData(searchTerms)
+    updateData(DummySearch)
+    updateSection(1)
   };
 
-const searchKeywords = ( keywords, date, extra_days ) => {
-  const data = axios.get(`http://localhost:5000/api/v1.0/search?keywords=${keywords}&date=${date}&extra_days=${extra_days}`).then(resp => {
-    console.log(resp.data);
-  });
-  console.log(`http://localhost:5000/api/v1.0/search?keywords=${keywords}&date=${date}&extra_days=${extra_days}`)
-  updateData(data)
-  updateSection(1);
-};
+  const searchKeywords = ( keywords, date, extra_days ) => {
+    const searchTerms = {keywords: keywords, date: date, extra_days: extra_days}
+    updateSearchData(searchTerms)
+    axios.get(`http://localhost:5000/api/v1.0/search?keywords=${keywords}&date=${date}&extra_days=${extra_days}`).then(
+      resp => {
+        updateData(resp.data);
+        updateSection(1);
+    });
+    updateSection(4)
+  };
 
-const compareLinks = () => {
-  // call an API
-  // const data = fetch(.....)
-  updateSection(2);
-};
+  const dummySelectArticle = ( source, article, keywords, date, extra_days ) => {
+    console.log(`http://localhost:5000/api/v1.0/test?source=${source}&article=${article}&keywords=${keywords}&date=${date}&extra_days${extra_days}`)
+    updateData(DummyCompare)
+    updateSection(2);
+  };
 
-  const compareSearchResults = ({ source, article }) => {
-    const res = axios.get(`http://localhost:5000/api/v1.0/compare?source=${source}&article=${article}`).then(
+  const selectArticle = ( source, article, keywords, date, extra_days ) => {
+    axios.get(`http://localhost:5000/api/v1.0/test?source=${source}&article=${article}&keywords=${keywords}&date=${date}&extra_days${extra_days}`).then(
       resp => {
         console.log(resp.data);
+        updateData(resp.data);
+        updateSection(2);
     });
+    updateSection(4);
+  };
+
+  const submitLinks = ( link1 , link2 ) => {
+    axios.get(`http://localhost:5000/api/v1.0/results?link1=${link1}&link2=${link2}`).then(
+      resp => {
+        console.log(resp.data);
+        updateData(resp.data);
+        updateSection(3);
+    });
+    updateSection(4);
+  };
+
+  const dummySubmitLinks = ( link1 , link2 ) => {
+    console.log(link1, link2)
+    console.log(`http://localhost:5000/api/v1.0/results?link1=${link1}&link2=${link2}`)
     updateSection(3);
-  }
+  };
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", minHeight: "100vH"}}>
-      <Header userData={userData} data={globalData} />
+    <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", minHeight: "100vH", backgroundColor: "#F2FBFF"}}>
       {section === 0 && <SearchView searchKeywords={searchKeywords}/>}
-      {section === 1 && (
-        <ArticlesView />
-      )}
-      {section === 2 && (
-        <AnalysisView/>
-      )}
+      {section === 1 && <ArticlesView data={globalData} searchData={searchData} selectArticle={selectArticle}/>}
+      {section === 2 && <ArticleSelectView data={globalData} searchData={searchData} submitLinks={submitLinks}/>}
+      {section === 3 && <AnalysisView data={globalData}/>}
+      {section === 4 && <LoadingView/>}
     </div>
   );
 };
 
-// const ArticlesView = ({ data, compareLinks }) => {
-//   return (
-//     <>
-//       <div>{JSON.stringify(data)}</div>
-//       <button onClick={compareLinks}>Update the data</button>
-//     </>
-//   );
+  // return (
+  //   <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", minHeight: "100vH", backgroundColor: "#F2FBFF"}}>
+  //     {section === 0 && <SearchView searchKeywords={dummySearchKeywords} submitLinks={dummySubmitLinks}/>}
+  //     {section === 1 && <ArticlesView data={DummySearch} searchData={searchData} selectArticle={dummySelectArticle}/>}
+  //     {section === 2 && <ArticleSelectView data={DummyCompare} searchData={searchData} submitLinks={dummySubmitLinks}/>}
+  //     {section === 3 && <AnalysisView data={DummyAnalysis} />}
+  //     {section === 4 && <LoadingView />}
+  //   </div>
+  // );
 // };
-const Header = ({ userData }) => {
-  return <header>Hi, {userData.name}</header>;
-};
+
+const LoadingView = () => {
+  return(
+    <>
+      <header style={{marginTop: "-250px", marginBottom: "20px", fontSize: "50px", textAlign: "center"}}> Loading </header>
+      <CircularProgress />
+    </>
+  )
+}

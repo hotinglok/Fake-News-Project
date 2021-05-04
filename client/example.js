@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import "./styles.css";
-import { useState } from "react";
 export default function App() {
   return (
     <div className="App">
@@ -11,6 +10,7 @@ export default function App() {
 const State = () => {
   const [userData, updateUserData] = useState({});
   const [stage, updateStage] = useState(0);
+  
   const fetchUserData = () => {
     // call an API
     // const data = fetch(.....)

@@ -125,7 +125,7 @@ class DocSim:
 
             # Match the sentence with the highest similarity score
             result_sentence = results[0].get('item').get('sentence')
-            result_index = results[0].get('item').get('position')
+            result_index = results[0].get('item').get('index')
 
             # Remove matched pair from respective lists
             if swapped == True:
@@ -142,15 +142,10 @@ class DocSim:
             # Remove the matched sentence from the root_list
             root_list.remove(root_list[0])
         
-        # Conditions to handle unequal list sizes
-        if len(root_list) > 0:
+        # The root list will always be the one that runs out first
+        if len(other_list) > 0:
             if swapped == True:
                 first_source['unsorted_{}'.format(data_type)] = other_list
-            else:
-                first_source['unsorted_{}'.format(data_type)] = root_list
-        elif len(other_list) > 0:
-            if swapped == True:
-                second_source['unsorted_{}'.format(data_type)] = root_list
             else:
                 second_source['unsorted_{}'.format(data_type)] = other_list
             
