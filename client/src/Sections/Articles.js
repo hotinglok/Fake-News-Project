@@ -94,17 +94,13 @@ const Header = ({ source, matches }) => {
 
 const Column = ({ source, id, data, select, search }) => {
     const classes = useStyles();
-    const handler = (index, id) =>{
-      console.log(index) 
-      console.log(id) 
-    };
     return (
         <Paper classes={{root: classes.paperRoot}} elevation={3} >
             <Header source={source} matches={data? Object.keys(data).length : "No Matches"} />
             {data? <List className={classes.list}>
                 {data.map((article, index) => (
                     <ListItem key={index} className={classes.listItem} onClick={() => select(id, index, search.keywords, search.date, search.extra_days)}>
-                        <ArticleCard title={article.title} pubDate={article.pubDate} sourceID={id}/>
+                        <ArticleCard title={article.title} pubDate={article.pubDate} sourceID={id} style={{width: "100%"}}/>
                     </ListItem>
                 ))}
             </List> : <Typography variant="h5" style={{textAlign: "center", marginTop: "20px"}}>No Matches</Typography>}

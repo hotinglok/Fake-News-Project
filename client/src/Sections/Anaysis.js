@@ -1,11 +1,33 @@
 import React, { useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import { Paper, Typography, makeStyles } from '@material-ui/core';
+import { Box, CardActionArea, Paper, Typography, makeStyles } from '@material-ui/core';
 import { v4 as uuid } from 'uuid';
-import DummyAnalysis from '../Dummy/AnalysisResults'
 
 const useStyles = makeStyles(theme => ({
-  paper: {
+  header: {
+    padding: "20px",
+    display: "flex",
+    flexDirection: "column",
+    maxWidth: "40vW",
+  },
+  keyword_container: {
+    display: "grid",
+    gridTemplateRows: "1fr 1fr 1fr",
+    gridTemplateColumns: "1fr 1fr 1fr",
+    gap: "1rem"
+  },
+  keyword: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    height: "1.5rem",
+    padding: "1rem",
+    backgroundColor: "#F0FFFA"
+  },
+  card: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
       userSelect: "none",
       fontSize: "14px",
       color: "#212121",
@@ -13,16 +35,36 @@ const useStyles = makeStyles(theme => ({
       border: "2px",
       borderRadius: "12px",
       margin: "0 0 12px 0",
-      minHeight: "8rem",
+      minHeight: "12rem",
       backgroundColor: "#ffffff",
       transition: "background 0.2s",
       '&:active': {
         backgroundColor: '#fff9c4'
-    }
+      }
+  },
+  droppable: {
+    backgroundColor: "#eceff1",
+    padding: "10px 10px 2px 10px",
+    border: "1px",
+    borderRadius: "12px",
+    width: "40rem",
+    minHeight: "10.2rem",
+  },
+  high: {
+    color: "#00e676",
+    fontSize: "1rem"
+  },
+  medium: {
+    color: "#ffb300",
+    fontSize: "1rem"
+  },
+  low: {
+    color: "#d32f2f",
+    fontSize: "1rem"
   }
 }));
 
-function AddUUID(data){
+const AddUUID = (data) => {
   const test = data
   const result = []
   for(var i in test){
@@ -32,7 +74,7 @@ function AddUUID(data){
   return(result)
 }
 
-function getStyle(style) {
+const getStyle = (style) => {
   if (style?.transform) {
     const axisLockY = `translate(0px, ${style.transform.split(',').pop()}`;
     return {
@@ -42,6 +84,66 @@ function getStyle(style) {
   }
   return style;
 }
+
+const openInNewTab = (url) => {
+  const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
+  if (newWindow) newWindow.opener = null
+}
+
+const Header = ({ data }) => {
+  const classes = useStyles();
+  const date_published = new Date(data.date_published).toLocaleString()
+  const date_modified = new Date(data.date_modified).toLocaleString()
+  return(
+      <Box style={{padding: "1rem"}} onClick={() => openInNewTab(data.url)}>
+        <CardActionArea>
+          <Paper elevation={2} className={classes.header}>
+              <Typography variant="h3" style={{textAlign: "center", marginBottom: "1rem"}}>
+                {data.source}
+              </Typography>
+              <Typography variant="h4" style={{marginBottom: "1rem"}}>
+                {data.headline}
+              </Typography>
+              <Typography variant="h6" style={{marginBottom: "1rem", fontSize: "1.2rem", }}>
+                Date Published: {date_published}
+              </Typography>
+              <Typography variant="h6" style={{marginBottom: "1rem", fontSize: "1.2rem"}}>
+                Last Modified: {date_modified}
+              </Typography>
+              <Typography variant="h6" style={{marginBottom: "1rem", fontSize: "1.2rem"}}>
+                Total Sentences: {data.num_sentences}
+              </Typography>
+              <Typography variant="h6" style={{marginBottom: "0.5rem", fontSize: "1.15rem"}}>
+                Keywords:
+              </Typography>
+              <KeyWords data={data.keywords}/>
+          </Paper>
+        </CardActionArea>
+      </Box>
+  )
+
+}
+
+const KeyWords = ({ data }) =>{
+  const classes = useStyles();
+  return(
+    <Box className={classes.keyword_container} variant="outlined" elevation={0}>
+        {data.map((keyword) => (
+          <Paper className={classes.keyword} variant="outlined" elevation={3}>
+            <Typography variant="body1" style={{fontWeight: "bold"}}>
+              {keyword.keyword}
+            </Typography>
+            <Typography variant="body1">
+              {keyword.frequency}
+            </Typography>
+          </Paper>
+        ))}
+    </Box>
+  )
+
+}
+
+
 
 const onDragEnd = (result, columns, setColumns) => {
   if (!result.destination) return;
@@ -144,40 +246,41 @@ export const AnalysisView = ({ data }) => {
   return (
     <div style={{ display: "grid", 
                   gridTemplateColumns: "1fr 1fr",
-                  gridGap: "3rem",
                   justifyContent: "center", 
-                  height: "100%" }}>
+                  height: "100%",
+                  padding: "3rem 0 3rem 0" }}>
+      <Header data={data.first_source}/>
+      <Header data={data.second_source}/>
       <DragDropContext
         onDragEnd={result => onDragEnd(result, columns, setColumns)}
       >
-        {Object.entries(columns).map(([columnId, column], index) => {
+        {Object.entries(columns).map(([columnId, column]) => {
           return (
             <div
               style={{
                 display: "flex",
                 flexDirection: "column",
-                alignItems: "center"
+                alignItems: "center",
+                height: "100%",
               }}
               key={columnId}
             >
-              <Typography variant="h4" component="h2" style={{paddingBottom: "5px"}}>{column.name}</Typography>
+              <Typography variant="h4" component="h2" style={{paddingBottom: "1rem"}}>{column.name}</Typography>
               <div >
                 <Droppable droppableId={columnId} key={columnId}>
                   {(provided, snapshot) => {
                     return (
-                      <div
+                      <Paper
                         {...provided.droppableProps}
                         ref={provided.innerRef}
                         style={{
+                          marginBottom: "2rem",
                           background: snapshot.isDraggingOver
                             ? "lightblue"
-                            : "lightgrey",
-                          padding: "10px 10px 2px 10px",
-                          border: "1px",
-                          borderRadius: "12px",
-                          width: "40rem",
-                          minHeight: "10.2rem",
+                            : "#eceff1"
                         }}
+                        elevation={3}
+                        className={classes.droppable}
                       >
                         {column.items.map((item, index) => {
                           return (
@@ -193,11 +296,21 @@ export const AnalysisView = ({ data }) => {
                                     ref={provided.innerRef}
                                     {...provided.draggableProps}
                                     {...provided.dragHandleProps}
-                                    className={classes.paper}
+                                    className={classes.card}
                                     style={getStyle(provided.draggableProps.style, snapshot)}
                                   >
-                                    {console.log(item)}
-                                    {item.sentence}
+                                    <Typography variant="body1" style={{fontSize: "1.0625rem"}}>
+                                      {item.sentence}
+                                    </Typography>
+                                    <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
+                                      {item.score ? 
+                                      <Typography variant="body2" className={item.score > 0.5 ? (item.score > 0.7 ? classes.high : classes.medium) : classes.low}>
+                                        {item.score}
+                                      </Typography> : <div> </div>}
+                                      <Typography variant="body2" style={{fontSize: "1rem"}}>
+                                        {item.index}
+                                      </Typography>
+                                    </div>
                                   </Paper>
                                 );
                               }}
@@ -205,7 +318,7 @@ export const AnalysisView = ({ data }) => {
                           );
                         })}
                         {provided.placeholder}
-                      </div>
+                      </Paper>
                     );
                   }}
                 </Droppable>

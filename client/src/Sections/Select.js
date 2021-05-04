@@ -132,7 +132,7 @@ const Column = ({ source, data, select, disabled, submit, link1, link2 }) => {
                             </ListItem>
                         ))}
                     </List>
-                    <Button className={classes.button} variant="contained" color="primary" disabled={disabled} onClick={() => submit(link1, link2)}>
+                    <Button className={classes.button} variant="contained" color="secondary" disabled={disabled} onClick={() => submit(link1, link2)}>
                         Analyse
                     </Button>
                 </>}
