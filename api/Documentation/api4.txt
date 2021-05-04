@@ -2,6 +2,10 @@
 
 {
     first_source: {
+        date_published: 'date_published',
+        date_modified: 'date_modified',
+        url: 'url',
+        source: 'source',
         headline: 'headline',
         num_sentences: 'num_sentences,
         keywords: [
@@ -27,6 +31,10 @@
         ],
     },
     second_source: {
+        date_published: 'date_published',
+        date_modified: 'date_modified',
+        url: 'url',
+        source: 'source',
         headline: 'headline',
         num_sentences: 'num_sentences,
         sorted_quotations: [
