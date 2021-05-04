@@ -1,3 +1,7 @@
+# Parts of this code was originally made by Lucas Ou-Yang (@codelucas) and can be found at https://github.com/codelucas/newspaper/blob/master/newspaper/nlp.py.
+# This code is used under the MIT License stated in the repository above.
+# Edits have been made for the purposes of this project.
+
 import re
 import os
 
@@ -8,6 +12,7 @@ with open(stopwords_path) as f:
     stopwords = [line.rstrip() for line in f]
 
 # Functions
+# Keyword Extraction from newspaper3k
 def split_words(text):
     """Split a string into array of words
     """
@@ -48,6 +53,7 @@ def getKeywords(article, num_keywords=10):
 
     return data
 
+# Utility functions for returning separated/categorised text
 def getQuotes(url):
     """Return an object containing quotation from an article and the remaining sentences
     """
@@ -76,7 +82,7 @@ def getQuotes(url):
     return data
 
 def getStats(text):
-    """Return an object containing quotations from an article and the remaining sentences
+    """Return an object containing any sentences with a number from an article and the remaining sentences
     """
     stats = []
     for line in text[:]:   # [:] Shallow copy the list since I'm manipulating the data as I'm iterating through stuff

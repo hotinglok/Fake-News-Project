@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import { Box, CardActionArea, Paper, Typography, makeStyles } from '@material-ui/core';
+import { Box, CardActionArea, List, ListItem, Paper, Typography, makeStyles } from '@material-ui/core';
 import { v4 as uuid } from 'uuid';
 
 const useStyles = makeStyles(theme => ({
@@ -21,6 +21,7 @@ const useStyles = makeStyles(theme => ({
     flexDirection: "row",
     justifyContent: "space-between",
     height: "1.5rem",
+    width: "100%",
     padding: "1rem",
     backgroundColor: "#F0FFFA"
   },
@@ -127,8 +128,9 @@ const Header = ({ data }) => {
 const KeyWords = ({ data }) =>{
   const classes = useStyles();
   return(
-    <Box className={classes.keyword_container} variant="outlined" elevation={0}>
-        {data.map((keyword) => (
+    <List className={classes.keyword_container} variant="outlined" elevation={0} >
+      {data.map((keyword) => (
+        <ListItem key={uuid()}>
           <Paper className={classes.keyword} variant="outlined" elevation={3}>
             <Typography variant="body1" style={{fontWeight: "bold"}}>
               {keyword.keyword}
@@ -137,13 +139,11 @@ const KeyWords = ({ data }) =>{
               {keyword.frequency}
             </Typography>
           </Paper>
-        ))}
-    </Box>
+        </ListItem>
+      ))}
+    </List>
   )
-
 }
-
-
 
 const onDragEnd = (result, columns, setColumns) => {
   if (!result.destination) return;
