@@ -1,4 +1,4 @@
-export const DummyAnalysis = {
+const DummyAnalysis = {
     "first_source": {
         "date_modified": "2021-04-23T20:50:26.000Z",
         "date_published": "2021-04-23T20:50:26.000Z",

@@ -94,7 +94,6 @@ const State = () => {
   // );
 // };
 
-
 const LoadingView = () => {
   return(
     <>
