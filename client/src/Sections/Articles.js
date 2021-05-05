@@ -2,17 +2,6 @@ import React from 'react';
 import { Paper, Card, CardContent, List, ListItem, Typography, makeStyles } from '@material-ui/core'
 import { style } from '@material-ui/system'
 
-export const textColor = style({
-  prop: 'color',
-  themeKey: 'palette',
-});
-
-export const bgcolor = style({
-  prop: 'bgcolor',
-  cssProperty: 'backgroundColor',
-  themeKey: 'palette',
-});
-
 const useStyles = makeStyles(theme => ({
     root: {
         display: "flex",
@@ -91,36 +80,38 @@ const Header = ({ source, matches }) => {
     )
 };  
 
-
 const Column = ({ source, id, data, select, search }) => {
     const classes = useStyles();
     return (
         <Paper classes={{root: classes.paperRoot}} elevation={3} >
-            <Header source={source} matches={data? Object.keys(data).length : "No Matches"} />
-            {data? <List className={classes.list}>
+            <Header source={source} matches={data? Object.keys(data).length : "0"} />
+            {data ? <List className={classes.list}>
                 {data.map((article, index) => (
                     <ListItem key={index} className={classes.listItem} onClick={() => select(id, index, search.keywords, search.date, search.extra_days)}>
                         <ArticleCard title={article.title} pubDate={article.pubDate} sourceID={id} style={{width: "100%"}}/>
                     </ListItem>
                 ))}
-            </List> : <Typography variant="h5" style={{textAlign: "center", marginTop: "20px"}}>No Matches</Typography>}
+            </List> : <Typography variant="h5" style={{textAlign: "center", marginTop: "20px", marginBottom: "20px"}}>No Matches</Typography>}
         </Paper>
     )
 };
 
-
 export const ArticlesView = ({ data, searchData, selectArticle }) => {
     console.log(searchData)
+    console.log(data)
     return (
-        <div style={{display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", 
-                    gridTemplateRows: "1fr", 
-                    gap: "100px", 
-                    justifyContent: "center",
-                    padding: "50px"}}>
-            <Column source="BBC News" id="0" data={data.bbc_news} select={selectArticle} search={searchData} />
-            <Column source="The Guardian" id="1" data={data.the_guardian} select={selectArticle} search={searchData}/>
-            <Column source="Sky News" id="2" data={data.sky_news} select={selectArticle} search={searchData}/>
-            <Column source="Daily Mail" id="3" data={data.daily_mail} select={selectArticle} search={searchData}/>
+        <div style={{display: "flex", flexDirection: "column", justifyContent:  "center"}}>
+            <div style={{display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", 
+                        gridTemplateRows: "1fr", 
+                        gap: "100px", 
+                        justifyContent: "center",
+                        padding: "50px"}}>
+                <Column source="BBC News" id="0" data={data.bbc_news} select={selectArticle} search={searchData} />
+                <Column source="The Guardian" id="1" data={data.the_guardian} select={selectArticle} search={searchData}/>
+                <Column source="Sky News" id="2" data={data.sky_news} select={selectArticle} search={searchData}/>
+                <Column source="Daily Mail" id="3" data={data.daily_mail} select={selectArticle} search={searchData}/>
+            </div>
+            {data  ? <Typography variant="h4" style={{textAlign: "center"}}> Please refresh to search again</Typography> : <></>}
         </div>
     ); 
   };

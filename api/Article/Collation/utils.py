@@ -29,13 +29,10 @@ def readData(source, con, date="none", extra_days=False):
     return existing_data
 
 # Queries a dataframe to find rows with ANY of the keywords. This is to increase likelihood of finding a related article in this first filter.
-def searchData(data, search):
+def searchData(data, search, source):
     keywords = search.lower().split()
     keywords_string = "|".join(keywords)
-    if len(data) < 1:
-        matches_df = []
-        return matches_df
-    source_name = data['source'].iloc[0]
+    source_name = source
 
     # For each selected column, make all entries lowercase and return true where rows contain keywords.
     ''' Both The Guardian and Sky News have keywords which aren't found in the headline/description. This is especially bad with
@@ -67,7 +64,7 @@ def getData(keywords, date="none", extra_days=False):
     # For each source, search for matches. If no matches exist, do not add dataframe into queried_sources
     for source in sources:
         data = readData(source, con, date, extra_days)
-        queried_data = searchData(data, keywords)
+        queried_data = searchData(data, keywords, source.name)
         queried_data = queried_data.astype({'pubDate': 'string'})
         if queried_data.empty == True:
             continue
