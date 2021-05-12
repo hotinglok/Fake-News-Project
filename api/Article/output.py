@@ -43,6 +43,8 @@ def analyseArticles(url1, url2):
 
     # Final payload
     data = {}
+    data['first_source'] = {}
+    data['second_source'] = {}
 
     # Get quotes, separate text
     first_quotes = getQuotes(first_source_link)
@@ -50,8 +52,10 @@ def analyseArticles(url1, url2):
     # Sort quotes
     sorted_quotes = ds.calculateSimilarity('quotations', first_quotes.get('quotes'), second_quotes.get('quotes'))
     # Add quotes to final payload
-    data['first_source'] = sorted_quotes.get('first_source')
-    data['second_source'] = sorted_quotes.get('second_source')
+    data.get('first_source')['sorted_quotations'] = sorted_quotes.get('first_source').get('sorted_quotations')
+    data.get('first_source')['unsorted_quotations'] = sorted_quotes.get('first_source').get('unsorted_quotations')
+    data.get('second_source')['sorted_quotations'] = sorted_quotes.get('second_source').get('sorted_quotations')
+    data.get('second_source')['unsorted_quotations'] = sorted_quotes.get('second_source').get('unsorted_quotations')
 
     # Get sentences containing numbers from the remaining text, separate from text
     first_stats = getStats(first_quotes.get('text'))

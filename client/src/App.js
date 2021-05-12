@@ -52,7 +52,7 @@ const State = () => {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", minHeight: "100vH", backgroundColor: "#F2FBFF"}}>
-      {section === 0 && <SearchView searchKeywords={searchKeywords}/>}
+      {section === 0 && <SearchView searchKeywords={searchKeywords} submitLinks={submitLinks}/>}
       {section === 1 && <ArticlesView data={globalData} searchData={searchData} selectArticle={selectArticle}/>}
       {section === 2 && <ArticleSelectView data={globalData} searchData={searchData} submitLinks={submitLinks}/>}
       {section === 3 && <AnalysisView data={globalData}/>}

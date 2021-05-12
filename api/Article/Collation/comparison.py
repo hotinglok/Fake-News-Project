@@ -143,10 +143,9 @@ class DocSim:
             root_list.remove(root_list[0])
         
         # The root list will always be the one that runs out first
-        if len(other_list) > 0:
-            if swapped == True:
-                first_source['unsorted_{}'.format(data_type)] = other_list
-            else:
-                second_source['unsorted_{}'.format(data_type)] = other_list
+        if swapped == True:
+            first_source['unsorted_{}'.format(data_type)] = other_list
+        else:
+            second_source['unsorted_{}'.format(data_type)] = other_list
             
         return {'first_source': first_source, 'second_source': second_source}

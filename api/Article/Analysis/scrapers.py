@@ -35,19 +35,25 @@ class bbc:
         self.name = 'BBC News'
         
     def get_body(self) -> list:
-        body = self.soup.find(class_="ssrcss-5h7eao-ArticleWrapper e1nh2i2l0")
+        body = self.soup.find('article')
         sentences = []
         count = 1
-        for p in body.find_all('div', attrs={'data-component':"text-block"}):
-            sentences.append({'sentence': p.text, 'index': count})
-            count = count + 1
+        for p in body.find_all(class_='ssrcss-18snukc-RichTextContainer'):
+            if p.find(class_="ssrcss-1pzprxn-BulletListContainer e5tfeyi0"):
+                continue
+            else:
+                sentences.append({'sentence': p.text, 'index': count})
+                count = count + 1
         return sentences
     
     def get_article(self) -> list:
-        body = self.soup.find(class_="ssrcss-5h7eao-ArticleWrapper e1nh2i2l0")
+        body = self.soup.find('article')
         sentences = []
-        for index, p in enumerate(body.find_all('div', attrs={'data-component':"text-block"} )):
-            sentences.append(p.text)
+        for p in body.find_all(class_='ssrcss-18snukc-RichTextContainer'):
+            if p.find(class_="ssrcss-1pzprxn-BulletListContainer e5tfeyi0"):
+                continue
+            else:
+                sentences.append(p.text)
         return sentences
 
     def get_title(self) -> str:
@@ -85,7 +91,7 @@ class guardian:
         sentences = []
         count = 1
         for p in body:
-            if p.text =='': # Guardian has a strange <p> block with no contents called 'sign-in-gate'.
+            if p.text ==' ' or p.text =='': # Guardian has a strange <p> block with no contents called 'sign-in-gate'.
                 continue
             else:
                 sentences.append({'sentence': p.text, 'index': count})
@@ -98,14 +104,14 @@ class guardian:
             p.decompose()
         sentences = []
         for index, p in enumerate(body):
-            if p.text =='': # Guardian has a strange <p> block with no contents called 'sign-in-gate'.
+            if p.text ==' ' or p.text =='': # Guardian has a strange <p> block with no contents called 'sign-in-gate'.
                 continue
             else:
                 sentences.append(p.text)
         return sentences
     
     def get_title(self) -> str:
-        return self.soup.find(class_="css-1nupfq9").text
+        return self.soup.find(class_="css-7g0r1e").text
 
     def get_date_published(self):
         data = self.soup.find('script', type='application/ld+json').string
@@ -137,7 +143,7 @@ class sky:
         sentences = []
         count = 1
         for p in body.find_all('p'):
-            if p.text ==' ': # Random gap, not sure where it is.
+            if p.text ==' ' or p.text =='': # Random gap, not sure where it is.
                 continue
             elif isPhraseIn('live updates from the UK and around the world', p.text) == True:
                 continue
@@ -150,7 +156,7 @@ class sky:
         body = self.soup.find(class_="sdc-article-body sdc-article-body--story sdc-article-body--lead")
         sentences = []
         for index, p in enumerate(body.find_all('p')):
-            if p.text ==' ': # Random gap, not sure where it is.
+            if p.text ==' ' or p.text =='': # Random gap, not sure where it is.
                 continue
             elif isPhraseIn('live updates from the UK and around the world', p.text) == True:
                 continue

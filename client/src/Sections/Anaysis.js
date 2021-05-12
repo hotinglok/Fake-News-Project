@@ -222,7 +222,7 @@ export const AnalysisView = ({ data }) => {
     },
     [uuid()]: {
       name: "Sorted Text",
-      items: AddUUID(data.second_source.sorted_stats)
+      items: AddUUID(data.second_source.sorted_text)
     },
     [uuid()]: {
       name: "Unsorted Text",
