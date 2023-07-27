@@ -13,7 +13,7 @@ I originally intended to have this all nicely written up after submitting my dis
 - Docker
 
 ## System Diagram
-![image](https://github.com/hotinglok/Fake-News-Project/assets/53564281/938092a2-4ef2-452e-bca1-797dc67d7f87)
+![image](https://github.com/hotinglok/Fake-News-Project/assets/53564281/c322d84d-4f23-446d-9e2d-988bb924ee99)
 
 ## Overview
 This is a web-app that allows a user to search for news articles about the same story from the four most viewed UK news providers (based on Ofcom 2020 data) and show how similar two chosen articles are by grouping paragraphs into statements that are shared/not shared between chosen articles. This is to help a user better infer which statements could be considered 'facts' based on consistency of the information presented and gain a better understanding of how each news provider prioritises and presents the information they publish. For example, there could be intention shown by one news provider showing a statistic/quotation early on in the article compared to another which shows the same statistc/quotation towards the end of an article or not even at all. 
