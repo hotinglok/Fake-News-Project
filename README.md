@@ -1,7 +1,7 @@
 # Fake-News-Project
 
 **Update July 2023**: This was the code for my MEng Final Year Project. 
-I originally intended to have this all nicely written up after submitting my dissertation, but the thought of freedom after 6 months of hard work on this very quickly overtook any desire I had to look at this code again for the immediate weeks/months proceeding the end of my degree. This has been an ongoing feeling until as of late when I have a need to update my professional profiles again. For the time being, please have a quick look over this readme for a brief explanation of what this project was about, some of the screenshots of the working project by the time I had to present, and some 
+I originally intended to have this all nicely written up after submitting my dissertation, but the thought of freedom after 6 months of hard work on this very quickly overtook any desire I had to look at this code again for the immediate weeks/months proceeding the end of my degree. This has been an ongoing feeling until as of late. For the time being, please have a quick look over this readme for a brief explanation of what this project was about, some of the screenshots of the working project by the time I had to present, and some 
 things I aim to do to offically 'finish' this.
 
 > **Note**: Please also understand that this is code representative of what knowledge and skill I **_had_** as a final year university student.
